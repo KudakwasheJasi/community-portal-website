@@ -1,0 +1,76 @@
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: community-portal-db
+    environment:
+      POSTGRES_DB: community_portal
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - community-portal
+
+  # Redis for caching
+  redis:
+    image: redis:7-alpine
+    container_name: community-portal-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - community-portal
+
+  # NestJS Backend
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: community-portal-backend
+    environment:
+      NODE_ENV: development
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USERNAME: postgres
+      DB_PASSWORD: password
+      DB_DATABASE: community_portal
+      JWT_SECRET: your-super-secret-jwt-key-change-in-production
+      EMAIL_HOST: smtp.gmail.com
+      EMAIL_PORT: 587
+      EMAIL_USER: your-email@gmail.com
+      EMAIL_PASS: your-app-password
+      EMAIL_FROM: noreply@communityportal.com
+    ports:
+      - "3000:3000"
+    depends_on:
+      - postgres
+      - redis
+    volumes:
+      - ./Backend/uploads:/app/uploads
+    networks:
+      - community-portal
+
+  # Next.js Frontend (when ready)
+  # frontend:
+  #   build:
+  #     context: ./client
+  #     dockerfile: Dockerfile
+  #   container_name: community-portal-frontend
+  #   ports:
+  #     - "3001:3000"
+  #   depends_on:
+  #     - backend
+  #   networks:
+  #     - community-portal
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  community-portal:
+    driver: bridge
