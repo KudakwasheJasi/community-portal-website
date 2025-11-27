@@ -1,7 +1,7 @@
 // src/services/api.ts
 import axios from 'axios';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
 const api = axios.create({
   baseURL: API_URL,
@@ -19,14 +19,19 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Assignment related API calls
-export const getAssignments = async () => {
-  const { data } = await api.get('/assignments');
+// Auth related API calls
+export const registerUser = async (userData: any) => {
+  const { data } = await api.post('/auth/register', userData);
   return data;
 };
 
-export const getAssignment = async (id) => {
-  const { data } = await api.get(`/assignments/${id}`);
+export const loginUser = async (credentials: any) => {
+  const { data } = await api.post('/auth/login', credentials);
+  return data;
+};
+
+export const getProfile = async () => {
+  const { data } = await api.get('/auth/profile');
   return data;
 };
 
@@ -36,9 +41,40 @@ export const getUsers = async () => {
   return data;
 };
 
-// Analytics
-export const getAnalytics = async () => {
-  const { data } = await api.get('/analytics/dashboard');
+// Posts related API calls
+export const getPosts = async () => {
+  const { data } = await api.get('/posts');
+  return data;
+};
+
+export const getPost = async (id: string | number) => {
+  const { data } = await api.get(`/posts/${id}`);
+  return data;
+};
+
+export const createPost = async (postData: any, file?: File) => {
+  const formData = new FormData();
+  formData.append('title', postData.title);
+  formData.append('description', postData.description);
+  if (file) {
+    formData.append('file', file);
+  }
+  const { data } = await api.post('/posts', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+  return data;
+};
+
+// Events related API calls (assuming similar structure)
+export const getEvents = async () => {
+  const { data } = await api.get('/events');
+  return data;
+};
+
+export const registerForEvent = async (eventId: string | number) => {
+  const { data } = await api.post(`/events/${eventId}/register`);
   return data;
 };
 
