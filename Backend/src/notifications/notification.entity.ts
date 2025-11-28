@@ -1,5 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
-import { User } from '../users/user.entity';
+import { User } from '../users/user.entity.js';
 
 export enum NotificationType {
   INFO = 'info',
@@ -25,8 +25,8 @@ export class Notification {
   id: string;
 
   @Column({
-    type: 'enum',
-    enum: NotificationType,
+    type: 'varchar',
+    length: 30,
     default: NotificationType.INFO
   })
   type: NotificationType;
@@ -34,12 +34,12 @@ export class Notification {
   @Column('text')
   message: string;
 
-  @Column('jsonb', { nullable: true })
+  @Column('simple-json', { nullable: true })
   metadata?: Record<string, any>;
 
   @Column({
-    type: 'enum',
-    enum: NotificationStatus,
+    type: 'varchar',
+    length: 20,
     default: NotificationStatus.UNREAD
   })
   status: NotificationStatus;

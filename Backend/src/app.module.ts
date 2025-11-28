@@ -1,40 +1,43 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { ThrottlerModule } from '@nestjs/throttler';
-import { CacheModule } from '@nestjs/cache-manager';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { AuthModule } from './auth/auth.module';
-import { UsersModule } from './users/users.module';
-import { PostsModule } from './posts/posts.module';
-import { EventsModule } from './events/events.module';
-import { databaseConfig } from './config/database.config';
+import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
+import { AppController } from './app.controller.js';
+import { AppService } from './app.service.js';
+import configuration from './config/configuration.js';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+      load: [configuration],
+      envFilePath: `.env.${process.env.NODE_ENV || 'development'}`,
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: databaseConfig,
+      useFactory: (configService: ConfigService): TypeOrmModuleOptions => {
+        const isPostgres = configService.get('DB_TYPE') === 'postgres';
+        
+        if (isPostgres) {
+          return {
+            type: 'postgres',
+            url: configService.get('DATABASE_URL'),
+            entities: [__dirname + '/**/*.entity{.ts,.js}'],
+            synchronize: configService.get('DB_SYNCHRONIZE', configService.get('NODE_ENV') !== 'production'),
+            logging: configService.get('DB_LOGGING', configService.get('NODE_ENV') === 'development'),
+            ssl: { rejectUnauthorized: false }
+          } as TypeOrmModuleOptions;
+        } else {
+          return {
+            type: 'better-sqlite3',
+            database: configService.get('DB_DATABASE', './database.sqlite'),
+            entities: [__dirname + '/**/*.entity{.ts,.js}'],
+            synchronize: configService.get('DB_SYNCHRONIZE', configService.get('NODE_ENV') !== 'production'),
+            logging: configService.get('DB_LOGGING', configService.get('NODE_ENV') === 'development'),
+          } as TypeOrmModuleOptions;
+        }
+      },
       inject: [ConfigService],
     }),
-    ThrottlerModule.forRoot([
-      {
-        ttl: 60000,
-        limit: 10,
-      },
-    ]),
-    CacheModule.register({
-      isGlobal: true,
-      ttl: 300000, // 5 minutes
-    }),
-    AuthModule,
-    UsersModule,
-    PostsModule,
-    EventsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

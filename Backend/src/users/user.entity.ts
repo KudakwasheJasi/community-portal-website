@@ -1,10 +1,10 @@
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, OneToMany, BeforeInsert, BeforeUpdate } from 'typeorm';
-import { Post } from '../posts/post.entity';
-import { Event } from '../events/event.entity';
-import { EventRegistration } from '../events/event-registration.entity';
-import { Comment } from '../comments/comment.entity';
-import { Like } from '../likes/like.entity';
-import { Notification } from '../notifications/notification.entity';
+import { Post } from '../posts/post.entity.js';
+import { Event } from '../events/event.entity.js';
+import { EventRegistration } from '../events/event-registration.entity.js';
+import { Comment } from '../comments/comment.entity.js';
+import { Like } from '../likes/like.entity.js';
+import { Notification } from '../notifications/notification.entity.js';
 import * as bcrypt from 'bcryptjs';
 
 export enum UserRole {
@@ -34,8 +34,8 @@ export class User {
   avatar?: string;
 
   @Column({ 
-    type: 'enum',
-    enum: UserRole,
+    type: 'varchar',
+    length: 20,
     default: UserRole.USER 
   })
   role: UserRole;

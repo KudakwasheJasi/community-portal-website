@@ -39,7 +39,7 @@ export class PostsService {
     });
   }
 
-  async create(createPostData: Partial<Post>): Promise<Post> {
+  async create(createPostData: Partial<Post>, file: Express.Multer.File, user: any): Promise<Post> {
     const post = this.postRepository.create(createPostData);
     return this.postRepository.save(post);
   }

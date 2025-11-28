@@ -1,7 +1,7 @@
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany, JoinColumn, RelationId } from 'typeorm';
-import { User } from '../users/user.entity';
-import { Post } from '../posts/post.entity';
-import { Like } from '../likes/like.entity';
+import { User } from '../users/user.entity.js';
+import { Post } from '../posts/post.entity.js';
+import { Like } from '../likes/like.entity.js';
 
 export enum CommentStatus {
   ACTIVE = 'active',
@@ -18,8 +18,8 @@ export class Comment {
   content: string;
 
   @Column({ 
-    type: 'enum',
-    enum: CommentStatus,
+    type: 'varchar',
+    length: 20,
     default: CommentStatus.ACTIVE
   })
   status: CommentStatus;

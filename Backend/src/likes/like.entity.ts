@@ -1,7 +1,7 @@
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, ManyToOne, JoinColumn, Index } from 'typeorm';
-import { User } from '../users/user.entity';
-import { Post } from '../posts/post.entity';
-import { Comment } from '../comments/comment.entity';
+import { User } from '../users/user.entity.js';
+import { Post } from '../posts/post.entity.js';
+import { Comment } from '../comments/comment.entity.js';
 
 export enum LikeType {
   POST = 'post',
@@ -16,8 +16,8 @@ export class Like {
   id: string;
 
   @Column({
-    type: 'enum',
-    enum: LikeType,
+    type: 'varchar',
+    length: 10,
     nullable: false
   })
   type: LikeType;

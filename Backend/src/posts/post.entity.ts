@@ -1,25 +1,36 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn, OneToMany, ManyToMany, JoinTable, Index } from 'typeorm';
-import { User } from '../users/user.entity';
-import { Comment } from '../comments/comment.entity';
-import { Like } from '../likes/like.entity';
-import { Category } from '../categories/category.entity';
-import { Tag } from '../tags/tag.entity';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+  ManyToOne,
+  JoinColumn,
+  OneToMany,
+  ManyToMany,
+  JoinTable,
+  Index,
+} from 'typeorm';
+import { User } from '../users/user.entity.js';
+import { Comment } from '../comments/comment.entity.js';
+import { Like } from '../likes/like.entity.js';
+import { Category } from '../categories/category.entity.js';
+import { Tag } from '../tags/tag.entity.js';
 
 export enum PostStatus {
   DRAFT = 'draft',
   PUBLISHED = 'published',
   ARCHIVED = 'archived',
-  DELETED = 'deleted'
+  DELETED = 'deleted',
 }
 
 export enum PostVisibility {
   PUBLIC = 'public',
   PRIVATE = 'private',
-  UNLISTED = 'unlisted'
+  UNLISTED = 'unlisted',
 }
 
 @Entity('posts')
-@Index(['slug'], { unique: true })
 export class Post {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -44,16 +55,16 @@ export class Post {
   images?: string[];
 
   @Column({
-    type: 'enum',
-    enum: PostStatus,
-    default: PostStatus.DRAFT
+    type: 'varchar',
+    length: 20,
+    default: PostStatus.DRAFT,
   })
   status: PostStatus;
 
   @Column({
-    type: 'enum',
-    enum: PostVisibility,
-    default: PostVisibility.PUBLIC
+    type: 'varchar',
+    length: 20,
+    default: PostVisibility.PUBLIC,
   })
   visibility: PostVisibility;
 
@@ -69,34 +80,37 @@ export class Post {
   @Column('uuid')
   authorId: string;
 
-  // Relations
-  @ManyToOne(() => User, user => user.posts, { onDelete: 'CASCADE' })
+  @ManyToOne(() => User, (user: User) => user.posts as Post[], {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'authorId' })
   author: User;
 
-  @OneToMany(() => Comment, comment => comment.post)
+  @OneToMany(() => Comment, (comment: Comment) => comment.post, {
+    lazy: true,
+  })
   comments: Comment[];
 
-  @OneToMany(() => Like, like => like.post)
+  @OneToMany(() => Like, (like) => like.post)
   likes: Like[];
 
-  @ManyToMany(() => Category, { cascade: true })
+  @ManyToMany(() => Category, (category) => category.posts, { cascade: true })
   @JoinTable({
     name: 'post_categories',
     joinColumn: { name: 'postId', referencedColumnName: 'id' },
-    inverseJoinColumn: { name: 'categoryId', referencedColumnName: 'id' }
+    inverseJoinColumn: { name: 'categoryId', referencedColumnName: 'id' },
   })
   categories: Category[];
 
-  @ManyToMany(() => Tag, { cascade: true })
+  @ManyToMany(() => Tag, (tag: Tag) => tag.posts, { cascade: true })
   @JoinTable({
     name: 'post_tags',
     joinColumn: { name: 'postId', referencedColumnName: 'id' },
-    inverseJoinColumn: { name: 'tagId', referencedColumnName: 'id' }
+    inverseJoinColumn: { name: 'tagId', referencedColumnName: 'id' },
   })
   tags: Tag[];
 
-  @CreateDateColumn()
+  @Column({ nullable: true })
   publishedAt: Date;
 
   @CreateDateColumn()
@@ -105,7 +119,7 @@ export class Post {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  // Virtual properties
+  // Virtual property to check if current user liked the post
   isLiked?: boolean;
 
   // Helper methods

@@ -28,8 +28,8 @@ export class File {
   size: number;
 
   @Column({
-    type: 'enum',
-    enum: FileType,
+    type: 'varchar',
+    length: 20,
     default: FileType.OTHER
   })
   type: FileType;
@@ -40,7 +40,7 @@ export class File {
   @Column({ nullable: true })
   altText?: string;
 
-  @Column('jsonb', { nullable: true })
+  @Column('simple-json', { nullable: true })
   metadata?: Record<string, any>;
 
   @Column({ default: 0 })
