@@ -22,7 +22,7 @@ import {
   Menu as MenuIcon,
 } from '@mui/icons-material';
 import { useRouter } from 'next/router';
-import { useAuth } from '@/components/hooks/useAuth';
+import { useAuth } from '@/context/AuthContext';
 import Image from 'next/image';
 
 const drawerWidth = 280;

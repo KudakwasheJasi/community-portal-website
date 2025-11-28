@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Box, AppBar, Toolbar, IconButton, Typography, useTheme, useMediaQuery, InputBase, Badge, Avatar, styled, alpha } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import SearchIcon from '@mui/icons-material/Search';
@@ -52,17 +52,27 @@ interface DashboardLayoutProps {
 
 const MainDashboardLayout: React.FC<DashboardLayoutProps> = ({ children, title = 'Dashboard' }) => {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    setMounted(true);
+  }, []);
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
 
+  if (!mounted) {
+    return null;
+  }
+
   return (
     <Box sx={{ display: 'flex', minHeight: '100vh' }}>
-      <MainNavigationSidebar open={mobileOpen} onClose={handleDrawerToggle} />
-      
+      <MainNavigationSidebar mobileOpen={mobileOpen} handleDrawerToggle={handleDrawerToggle} />
+
       <Box
         component="main"
         sx={{
@@ -73,9 +83,9 @@ const MainDashboardLayout: React.FC<DashboardLayoutProps> = ({ children, title =
           minHeight: '100vh',
         }}
       >
-        <Box sx={{ 
-          display: 'flex', 
-          alignItems: 'center', 
+        <Box sx={{
+          display: 'flex',
+          alignItems: 'center',
           justifyContent: 'space-between',
           p: 2,
           backgroundColor: 'transparent',
