@@ -1,26 +1,21 @@
 import React, { useState, useMemo, useCallback } from 'react';
-import ReactDOM from 'react-dom/client';
+import { useRouter } from 'next/router';
+import Head from 'next/head';
+import { createTheme } from '@mui/material/styles';
 import {
-  ThemeProvider,
-  createTheme,
-  CssBaseline,
-  AppBar,
-  Toolbar,
-  IconButton,
+  Box,
   Typography,
   Chip,
   Stack,
-  Box,
   Card,
   CardContent,
   CardMedia,
   Button,
   Container
 } from '@mui/material';
-import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
-import SearchIcon from '@mui/icons-material/Search';
 import EventBusyIcon from '@mui/icons-material/EventBusy';
 import CheckIcon from '@mui/icons-material/Check';
+import DashboardLayout from '@/components/DashboardLayout';
 
 // --- TYPES ---
 export interface EventData {
@@ -104,46 +99,74 @@ const FILTERS: FilterType[] = ['All', 'This Weekend', 'Online', 'Free'];
 
 // --- COMPONENTS ---
 
-// 1. Layout Component (Replaces external DashboardLayout)
-const Layout: React.FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => {
+// Event registration page component
+const EventsPage = () => {
+  const router = useRouter();
+  const [activeFilter, setActiveFilter] = useState<FilterType>('All');
+  const [events, setEvents] = useState<EventData[]>(EVENTS);
+
+  const featuredEvents = useMemo(() => 
+    events.filter(e => e.isFeatured), 
+  [events]);
+
+  const listEvents = useMemo(() => {
+    let filtered = events.filter(e => !e.isFeatured);
+    if (activeFilter !== 'All') {
+      filtered = events.filter(e => 
+        !e.isFeatured && e.tags.includes(activeFilter)
+      );
+    }
+    return filtered;
+  }, [events, activeFilter]);
+
+  const handleRegister = useCallback((id: string) => {
+    setEvents(prev => prev.map(event => {
+      if (event.id === id) {
+        const nextStatus = event.status === 'registered' ? 'open' : 'registered';
+        return { ...event, status: nextStatus };
+      }
+      return event;
+    }));
+  }, []);
+
   return (
-    <Container 
-      maxWidth="sm" 
-      disableGutters 
-      sx={{ 
-        bgcolor: 'background.default', 
-        minHeight: '100vh', 
-        boxShadow: { sm: 3 },
-        position: 'relative'
-      }}
-    >
-      <AppBar 
-        position="sticky" 
-        color="inherit" 
-        elevation={0} 
-        sx={{ 
-          borderBottom: '1px solid', 
-          borderColor: 'divider',
-          bgcolor: 'rgba(255, 255, 255, 0.9)',
-          backdropFilter: 'blur(8px)',
-        }}
-      >
-        <Toolbar>
-          <IconButton edge="start" aria-label="back">
-            <ArrowBackIosNewIcon />
-          </IconButton>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1, textAlign: 'center' }}>
-            {title}
-          </Typography>
-          <IconButton edge="end" aria-label="search">
-            <SearchIcon sx={{ fontSize: 28 }} />
-          </IconButton>
-        </Toolbar>
-      </AppBar>
-      <Box component="main">
-        {children}
+    <DashboardLayout title="Event Registration">
+      <Head>
+        <title>Event Registration | Community Portal</title>
+      </Head>
+      
+      <Box sx={{ p: 3 }}>
+        {/* Featured Events */}
+        {featuredEvents.length > 0 && (
+          <FeaturedCarousel
+            events={featuredEvents}
+            onRegister={handleRegister}
+          />
+        )}
+
+        {/* Filter Chips */}
+        <Box sx={{ 
+          position: 'sticky', 
+          top: 64, // Height of the AppBar
+          zIndex: 10, 
+          bgcolor: 'background.default',
+          pt: 2,
+          pb: 1
+        }}>
+          <FilterChips
+            filters={FILTERS}
+            activeFilter={activeFilter}
+            onFilterSelect={setActiveFilter}
+          />
+        </Box>
+
+        {/* Event List */}
+        <EventList
+          events={listEvents}
+          onRegister={handleRegister}
+        />
       </Box>
-    </Container>
+    </DashboardLayout>
   );
 };
 
@@ -336,64 +359,7 @@ const EventList: React.FC<EventListProps> = ({ events, onRegister }) => {
   );
 };
 
-// --- APP COMPONENT ---
-function App() {
-  const [activeFilter, setActiveFilter] = useState<FilterType>('All');
-  const [events, setEvents] = useState<EventData[]>(EVENTS);
-
-  const featuredEvents = useMemo(() => 
-    events.filter(e => e.isFeatured), 
-  [events]);
-
-  const listEvents = useMemo(() => {
-    let filtered = events.filter(e => !e.isFeatured);
-    if (activeFilter !== 'All') {
-      filtered = events.filter(e => 
-        !e.isFeatured && e.tags.includes(activeFilter)
-      );
-    }
-    return filtered;
-  }, [events, activeFilter]);
-
-  const handleRegister = useCallback((id: string) => {
-    setEvents(prev => prev.map(event => {
-      if (event.id === id) {
-        const nextStatus = event.status === 'registered' ? 'open' : 'registered';
-        return { ...event, status: nextStatus };
-      }
-      return event;
-    }));
-  }, []);
-
-  return (
-    <>
-      <FeaturedCarousel
-        events={featuredEvents}
-        onRegister={handleRegister}
-      />
-
-      <Box sx={{ 
-        position: 'sticky', 
-        top: 56, // Height of the AppBar
-        zIndex: 10, 
-        bgcolor: 'rgba(246, 247, 248, 0.95)', // Matches background.default with transparency
-        backdropFilter: 'blur(4px)',
-        pb: 1 
-      }}>
-         <FilterChips
-           filters={FILTERS}
-           activeFilter={activeFilter}
-           onFilterSelect={setActiveFilter}
-         />
-      </Box>
-
-      <EventList
-        events={listEvents}
-        onRegister={handleRegister}
-      />
-    </>
-  );
-}
+// --- COMPONENTS ---
 
 // --- THEME ---
 const theme = createTheme({
@@ -446,26 +412,4 @@ const theme = createTheme({
   },
 });
 
-// --- ROOT RENDER ---
-const EventsPage = () => {
-  return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <Layout title="Upcoming Events">
-        <App />
-      </Layout>
-    </ThemeProvider>
-  );
-}
-
-const rootElement = document.getElementById('root');
-if (!rootElement) {
-  throw new Error("Could not find root element to mount to");
-}
-
-const root = ReactDOM.createRoot(rootElement);
-root.render(
-  <React.StrictMode>
-    <EventsPage />
-  </React.StrictMode>
-);
+export default EventsPage;
