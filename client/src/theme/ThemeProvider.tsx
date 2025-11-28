@@ -25,11 +25,13 @@ export const ColorModeProvider: React.FC<ColorModeProviderProps> = ({ children }
 
   // Initialize theme mode from localStorage or system preference
   useEffect(() => {
-    const savedMode = localStorage.getItem('colorMode') as PaletteMode;
-    if (savedMode) {
-      setMode(savedMode);
-    } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      setMode('dark');
+    if (typeof window !== 'undefined') {
+      const savedMode = localStorage.getItem('colorMode') as PaletteMode;
+      if (savedMode) {
+        setMode(savedMode);
+      } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        setMode('dark');
+      }
     }
   }, []);
 
@@ -91,8 +93,10 @@ export const ColorModeProvider: React.FC<ColorModeProviderProps> = ({ children }
 
   // Add class to body for better CSS theming support
   useEffect(() => {
-    document.body.className = `theme-${mode}`;
-    document.body.style.backgroundColor = mode === 'dark' ? '#121212' : '#f5f7fa';
+    if (typeof window !== 'undefined') {
+      document.body.className = `theme-${mode}`;
+      document.body.style.backgroundColor = mode === 'dark' ? '#121212' : '#f5f7fa';
+    }
   }, [mode]);
 
   return (

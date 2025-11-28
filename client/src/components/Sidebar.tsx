@@ -72,9 +72,12 @@ const Sidebar: React.FC<SidebarProps> = ({ mobileOpen, handleDrawerToggle }) => 
       <List sx={{ flex: 1, overflowY: 'auto' }}>
         {menuItems.map((item) => (
           <ListItem key={item.text} disablePadding>
-            <ListItemButton 
+            <ListItemButton
               selected={router.pathname === item.path}
-              onClick={() => router.push(item.path)}
+              onClick={() => {
+                router.push(item.path);
+                if (isMobile) handleDrawerToggle();
+              }}
               sx={{
                 '&.Mui-selected': {
                   backgroundColor: theme.palette.primary.light,
