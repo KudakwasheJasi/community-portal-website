@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Typography,
@@ -21,6 +21,8 @@ import {
   CardActionArea,
   Chip,
   Paper,
+  Alert,
+  CircularProgress
 } from '@mui/material';
 import {
   Search,
@@ -42,6 +44,8 @@ import {
   Settings,
   Analytics,
 } from '@mui/icons-material';
+import postsService, { Post } from '@/services/posts.service';
+import eventsService, { Event } from '@/services/events.service';
 
 // --- Types & Interfaces ---
 interface StatData {
@@ -53,26 +57,7 @@ interface StatData {
   icon: React.ElementType;
 }
 
-interface PostData {
-  id: string;
-  author: string;
-  avatar: string;
-  time: string;
-  content: string;
-  likes: number;
-  comments: number;
-}
-
-interface EventData {
-  id: string;
-  title: string;
-  date: string;
-  location: string;
-  attendees: number;
-  image: string;
-}
-
-// --- Mock Data ---
+// --- Mock Data (for stats only, posts and events will be fetched) ---
 const STATS: StatData[] = [
   {
     id: '1',
@@ -105,48 +90,6 @@ const STATS: StatData[] = [
     trend: 'neutral',
     trendValue: 'Upcoming',
     icon: LocationOn,
-  },
-];
-
-const POSTS: PostData[] = [
-  {
-    id: '1',
-    author: 'Olivia Chen',
-    avatar: 'https://picsum.photos/seed/olivia/200',
-    time: '2h ago',
-    content:
-      'Just released a new plugin for our design system. It includes new components, improved accessibility, and better performance. Would love to get everyone\'s feedback!',
-    likes: 24,
-    comments: 8,
-  },
-  {
-    id: '2',
-    author: 'Liam Gallagher',
-    avatar: 'https://picsum.photos/seed/liam/200',
-    time: '5h ago',
-    content:
-      'Does anyone have experience with the new beta features? Looking for tips on how to get started.',
-    likes: 15,
-    comments: 4,
-  },
-];
-
-const EVENTS: EventData[] = [
-  {
-    id: '1',
-    title: 'Design System Meetup',
-    date: 'Mon, Oct 28 • 7:00 PM',
-    location: 'Virtual Event',
-    attendees: 12,
-    image: 'https://picsum.photos/seed/event1/600/400',
-  },
-  {
-    id: '2',
-    title: 'Project Showcase',
-    date: 'Wed, Nov 6 • 5:30 PM',
-    location: 'Community Hall',
-    attendees: 8,
-    image: 'https://picsum.photos/seed/event2/600/400',
   },
 ];
 
@@ -216,19 +159,21 @@ const StatCard: React.FC<{ data: StatData }> = ({ data }) => {
   );
 };
 
-const PostCard: React.FC<{ data: PostData }> = ({ data }) => {
+const PostCard: React.FC<{ data: Post }> = ({ data }) => {
   return (
     <Card sx={{ width: '100%' }}>
       <CardContent sx={{ p: 2 }}>
         <Stack direction="row" justifyContent="space-between" alignItems="flex-start" mb={1.5}>
           <Stack direction="row" spacing={1.5} alignItems="center">
-            <Avatar src={data.avatar} alt={data.author} sx={{ width: 40, height: 40 }} />
+            <Avatar sx={{ width: 40, height: 40, bgcolor: 'primary.main' }}>
+              {data.author ? data.author.charAt(0).toUpperCase() : 'U'}
+            </Avatar>
             <Box>
               <Typography variant="subtitle2" fontWeight={600}>
                 {data.author}
               </Typography>
               <Typography variant="caption" color="text.secondary">
-                {data.time}
+                {new Date(data.date).toLocaleDateString()}
               </Typography>
             </Box>
           </Stack>
@@ -238,7 +183,7 @@ const PostCard: React.FC<{ data: PostData }> = ({ data }) => {
         </Stack>
 
         <Typography variant="body2" color="text.primary" sx={{ mb: 2, lineHeight: 1.6 }}>
-          {data.content}
+          {data.description}
         </Typography>
 
         <Stack direction="row" justifyContent="space-between" alignItems="center">
@@ -248,14 +193,14 @@ const PostCard: React.FC<{ data: PostData }> = ({ data }) => {
               startIcon={<FavoriteBorder sx={{ fontSize: 18 }} />}
               sx={{ color: 'text.secondary', minWidth: 0, px: 1, '&:hover': { color: 'error.main' } }}
             >
-              {data.likes}
+              {data.views}
             </Button>
             <Button
               size="small"
               startIcon={<ChatBubbleOutline sx={{ fontSize: 18 }} />}
               sx={{ color: 'text.secondary', minWidth: 0, px: 1, '&:hover': { color: 'primary.main' } }}
             >
-              {data.comments}
+              0
             </Button>
           </Stack>
           <IconButton size="small" sx={{ color: 'text.secondary', '&:hover': { color: 'primary.main' } }}>
@@ -267,7 +212,7 @@ const PostCard: React.FC<{ data: PostData }> = ({ data }) => {
   );
 };
 
-const EventCard: React.FC<{ data: EventData }> = ({ data }) => {
+const EventCard: React.FC<{ data: Event }> = ({ data }) => {
   return (
     <Card
       sx={{
@@ -284,7 +229,7 @@ const EventCard: React.FC<{ data: EventData }> = ({ data }) => {
         sx={{
           height: 128,
           width: '100%',
-          backgroundImage: `url(${data.image})`,
+          backgroundImage: `url(${data.imageUrl})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           position: 'relative',
@@ -302,7 +247,7 @@ const EventCard: React.FC<{ data: EventData }> = ({ data }) => {
             {data.title}
           </Typography>
           <Typography variant="caption" sx={{ opacity: 0.9, fontWeight: 500 }}>
-            {data.date}
+            {data.date} • {data.time}
           </Typography>
         </Box>
       </Box>
@@ -310,7 +255,7 @@ const EventCard: React.FC<{ data: EventData }> = ({ data }) => {
         <Stack direction="row" spacing={0.5} alignItems="center" sx={{ color: 'text.secondary' }}>
           <LocationOn sx={{ fontSize: 16 }} />
           <Typography variant="caption" fontWeight={600}>
-            {data.location}
+            {data.location || 'TBD'}
           </Typography>
         </Stack>
         <Stack direction="row" spacing={-0.75} alignItems="center">
@@ -341,7 +286,7 @@ const EventCard: React.FC<{ data: EventData }> = ({ data }) => {
               zIndex: 1,
             }}
           >
-            +{data.attendees}
+            +12
           </Box>
         </Stack>
       </Box>
@@ -352,7 +297,48 @@ const EventCard: React.FC<{ data: EventData }> = ({ data }) => {
 // --- Main Component ---
 const AdvancedDashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState(0);
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [events, setEvents] = useState<Event[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const theme = useTheme();
+
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        setLoading(true);
+        setError('');
+        const [fetchedPosts, fetchedEvents] = await Promise.all([
+          postsService.getAll({ limit: 2 }),
+          eventsService.getAll()
+        ]);
+        setPosts(fetchedPosts);
+        setEvents(fetchedEvents.slice(0, 2)); // Show only first 2 events
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : 'Failed to load dashboard data');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
+  }, []);
+
+  if (loading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px' }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box sx={{ p: 2 }}>
+        <Alert severity="error">{error}</Alert>
+      </Box>
+    );
+  }
 
   return (
     <Box
@@ -383,7 +369,7 @@ const AdvancedDashboard: React.FC = () => {
             <Button size="small" sx={{ fontWeight: 600 }}>See All</Button>
           </Stack>
           <Stack spacing={2}>
-            {POSTS.map((post) => (
+            {posts.map((post) => (
               <PostCard key={post.id} data={post} />
             ))}
           </Stack>
@@ -406,7 +392,7 @@ const AdvancedDashboard: React.FC = () => {
               px: 2,
             }}
           >
-            {EVENTS.map((event) => (
+            {events.map((event) => (
               <EventCard key={event.id} data={event} />
             ))}
           </Box>

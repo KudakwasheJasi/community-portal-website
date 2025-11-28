@@ -18,6 +18,7 @@ import { Visibility, VisibilityOff } from '@mui/icons-material';
 import Head from 'next/head';
 import { styled } from '@mui/system';
 import NextLink from 'next/link';
+import { useAuth } from '@/context/AuthContext';
 
 interface FormData {
   email: string;
@@ -75,6 +76,7 @@ const LoginForm = styled(Paper)(({ theme }) => ({
 }));
 
 const Login: React.FC = () => {
+  const { login } = useAuth();
   const [formData, setFormData] = useState<FormData>({
     email: '',
     password: '',
@@ -82,6 +84,7 @@ const Login: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<Partial<FormData>>({});
   const [loginError, setLoginError] = useState('');
+  const [loading, setLoading] = useState(false);
   const [mounted, setMounted] = useState(false);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -111,11 +114,18 @@ const Login: React.FC = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (validate()) {
-      console.log('Login attempt with:', formData);
-      // setLoginError('Invalid email or password'); // Uncomment to simulate error
+      setLoading(true);
+      setLoginError('');
+      try {
+        await login(formData.email, formData.password);
+      } catch (err: unknown) {
+        setLoginError(err instanceof Error ? err.message : 'Login failed');
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -183,14 +193,15 @@ const Login: React.FC = () => {
           </Link>
         </Box>
         <Button
-          type="submit"
-          fullWidth
-          variant="contained"
-          size="large"
-          sx={{ mt: 2, mb: 2, py: 1.5, borderRadius: '8px' }}
-        >
-          Log In
-        </Button>
+           type="submit"
+           fullWidth
+           variant="contained"
+           size="large"
+           disabled={loading}
+           sx={{ mt: 2, mb: 2, py: 1.5, borderRadius: '8px' }}
+         >
+           {loading ? 'Logging In...' : 'Log In'}
+         </Button>
         <Box sx={{ textAlign: 'center', mt: 3 }}>
           <Typography variant="body2" color="text.secondary">
             Don't have an account?{' '}

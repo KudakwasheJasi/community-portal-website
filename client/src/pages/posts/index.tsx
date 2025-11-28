@@ -26,7 +26,8 @@ import {
   ToggleButton,
   Chip,
   Avatar,
-  Tooltip
+  Tooltip,
+  Alert
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -41,8 +42,17 @@ import {
 } from '@mui/icons-material';
 import MainDashboardLayout from '@/components/MainDashboardLayout';
 import CreateEditPostDialog from '@/components/posts/CreateEditPostDialog';
-import { Post, PostFormData } from '@/types/post';
 import { useTheme } from '@mui/material/styles';
+import postsService, { Post, CreatePostData, UpdatePostData } from '@/services/posts.service';
+
+interface PostFormData {
+  id?: string;
+  title: string;
+  description: string;
+  imageUrl?: string;
+  status?: 'published' | 'draft' | 'archived';
+  file?: File;
+}
 
 // Mock data for initial posts
 const INITIAL_POSTS: Post[] = [
@@ -99,13 +109,32 @@ type ViewMode = 'grid' | 'list';
 const PostsPage: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  const [posts, setPosts] = useState<Post[]>(INITIAL_POSTS);
-  const [filteredPosts, setFilteredPosts] = useState<Post[]>(INITIAL_POSTS);
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [filteredPosts, setFilteredPosts] = useState<Post[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingPostId, setEditingPostId] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  // Load posts on component mount
+  useEffect(() => {
+    const loadPosts = async () => {
+      try {
+        setLoading(true);
+        setError('');
+        const fetchedPosts = await postsService.getAll();
+        setPosts(fetchedPosts);
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : 'Failed to load posts');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadPosts();
+  }, []);
 
   // Load view mode preference from localStorage
   useEffect(() => {
@@ -150,47 +179,56 @@ const PostsPage: React.FC = () => {
     setDialogOpen(true);
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (window.confirm('Are you sure you want to delete this post?')) {
-      setPosts(prev => prev.filter(post => post.id !== id));
+      try {
+        setLoading(true);
+        setError('');
+        await postsService.delete(id);
+        setPosts(prev => prev.filter(post => post.id !== id));
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : 'Failed to delete post');
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
-  const handleSave = (data: PostFormData) => {
-    setLoading(true);
-    // Simulate API call
-    setTimeout(() => {
+  const handleSave = async (data: PostFormData) => {
+    try {
+      setLoading(true);
+      setError('');
+
       if (data.id) {
         // Update existing post
+        const updatedPost = await postsService.update(data.id!, {
+          id: data.id,
+          title: data.title,
+          description: data.description,
+          imageUrl: data.imageUrl,
+          status: data.status
+        }, data.file);
         setPosts(prev =>
           prev.map(post =>
-            post.id === data.id
-              ? { 
-                  ...post, 
-                  ...data, 
-                  imageUrl: data.imageUrl || DEFAULT_IMAGE,
-                  date: new Date().toISOString()
-                }
-              : post
+            post.id === data.id ? updatedPost : post
           )
         );
       } else {
         // Create new post
-        const newPost: Post = {
-          id: Math.random().toString(36).substr(2, 9),
-          ...data,
-          imageUrl: data.imageUrl || DEFAULT_IMAGE,
-          date: new Date().toISOString(),
-          status: 'published',
-          views: 0,
-          author: 'Current User',
-          tags: []
-        };
+        const newPost = await postsService.create({
+          title: data.title,
+          description: data.description,
+          imageUrl: data.imageUrl,
+          status: data.status
+        }, data.file);
         setPosts(prev => [newPost, ...prev]);
       }
-      setLoading(false);
       setDialogOpen(false);
-    }, 500);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to save post');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleRefresh = () => {
@@ -217,6 +255,11 @@ const PostsPage: React.FC = () => {
   return (
     <MainDashboardLayout title="Posts Management">
       <Container maxWidth="xl" sx={{ py: 3 }}>
+        {error && (
+          <Alert severity="error" sx={{ mb: 3 }}>
+            {error}
+          </Alert>
+        )}
         <Box>
           {/* Header Section */}
           <Box sx={{ mb: 3 }}>

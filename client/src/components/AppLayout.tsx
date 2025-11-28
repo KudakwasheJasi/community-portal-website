@@ -1,4 +1,5 @@
-import React from 'react';
+// components/AppLayout.tsx
+import React, { ReactNode } from 'react';
 import {
   AppBar,
   Toolbar,
@@ -9,68 +10,225 @@ import {
   IconButton,
   useTheme,
   useMediaQuery,
+  Drawer,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  Divider,
+  Avatar,
+  Menu,
+  MenuItem,
+  Tooltip,
+  Badge,
 } from '@mui/material';
 import { 
   Add as AddIcon, 
   Logout as LogoutIcon, 
-  Brightness4 as Brightness4Icon,
-  Brightness7 as Brightness7Icon,
+  Brightness4 as DarkIcon,
+  Brightness7 as LightIcon,
+  Home as HomeIcon,
+  Dashboard as DashboardIcon,
+  Event as EventIcon,
+  Menu as MenuIcon,
+  Notifications as NotificationsIcon,
+  Person as PersonIcon,
 } from '@mui/icons-material';
 import { useRouter } from 'next/router';
+import { useAuth } from '@/context/AuthContext';
 import { useColorMode } from '@/theme/ThemeProvider';
+import { ListItemButton } from '@mui/material';
+import Link from 'next/link';
 
-const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const router = useRouter();
+interface AppLayoutProps {
+  children: ReactNode;
+  title?: string;
+}
+
+const drawerWidth = 240;
+
+const AppLayout: React.FC<AppLayoutProps> = ({ children, title = 'Community Portal' }) => {
   const theme = useTheme();
-  const colorMode = useColorMode();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+const { mode: colorMode, toggleColorMode } = useColorMode();
+  const { user, logout } = useAuth();
+  const router = useRouter();
+  const [mobileOpen, setMobileOpen] = React.useState(false);
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
-  const handleCreatePost = () => {
-    router.push('/posts/create');
+  const handleDrawerToggle = () => {
+    setMobileOpen(!mobileOpen);
+  };
+
+  const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
   };
 
   const handleLogout = () => {
-    // TODO: Implement actual logout logic (clear token, update state)
+    logout();
     router.push('/login');
   };
 
+  const menuItems = [
+    { text: 'Home', icon: <HomeIcon />, path: '/' },
+    { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
+    { text: 'Events', icon: <EventIcon />, path: '/events' },
+  ];
+
+  const drawer = (
+    <div>
+      <Toolbar sx={{ display: 'flex', justifyContent: 'center', py: 2 }}>
+        <Typography variant="h6" noWrap component="div">
+          Community Portal
+        </Typography>
+      </Toolbar>
+      <Divider />
+      <List>
+        {menuItems.map((item) => (
+          <Link href={item.path} key={item.text} passHref>
+            <ListItemButton 
+              selected={router.pathname === item.path}
+              onClick={handleDrawerToggle}
+            >
+              <ListItemIcon>{item.icon}</ListItemIcon>
+              <ListItemText primary={item.text} />
+            </ListItemButton>
+          </Link>
+        ))}
+      </List>
+    </div>
+  );
+
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-      <AppBar position="static" sx={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
+    <Box sx={{ display: 'flex' }}>
+      <AppBar
+        position="fixed"
+        sx={{
+          width: { sm: `calc(100% - ${drawerWidth}px)` },
+          ml: { sm: `${drawerWidth}px` },
+        }}
+      >
         <Toolbar>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1, cursor: 'pointer' }} onClick={() => router.push('/dashboard')}>
-            Community Portal
+          <IconButton
+            color="inherit"
+            aria-label="open drawer"
+            edge="start"
+            onClick={handleDrawerToggle}
+            sx={{ mr: 2, display: { sm: 'none' } }}
+          >
+            <MenuIcon />
+          </IconButton>
+          <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
+            {title}
           </Typography>
-          <Button 
-            color="inherit" 
-            startIcon={<AddIcon />} 
-            onClick={handleCreatePost}
-            sx={{ mr: 1 }}
-          >
-            {!isMobile && 'New Post'}
-          </Button>
-          <IconButton 
-            color="inherit" 
-            onClick={colorMode.toggleColorMode} 
-            aria-label="toggle theme"
-            sx={{ mr: 1 }}
-          >
-            {theme.palette.mode === 'dark' ? <Brightness7Icon /> : <Brightness4Icon />}
-          </IconButton>
-          <IconButton 
-            color="inherit" 
-            onClick={handleLogout} 
-            aria-label="logout"
-          >
-            <LogoutIcon />
-          </IconButton>
+          
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <IconButton color="inherit" onClick={toggleColorMode}>
+              {theme.palette.mode === 'dark' ? <LightIcon /> : <DarkIcon />}
+            </IconButton>
+            
+            <Tooltip title="Notifications">
+              <IconButton color="inherit">
+                <Badge badgeContent={4} color="secondary">
+                  <NotificationsIcon />
+                </Badge>
+              </IconButton>
+            </Tooltip>
+            
+            <IconButton
+              onClick={handleProfileMenuOpen}
+              size="small"
+              sx={{ ml: 2 }}
+              aria-controls="profile-menu"
+              aria-haspopup="true"
+            >
+              <Avatar sx={{ width: 32, height: 32 }}>
+                {user?.name?.[0] || <PersonIcon />}
+              </Avatar>
+            </IconButton>
+          </Box>
         </Toolbar>
       </AppBar>
-      <Container component="main" sx={{ flexGrow: 1, py: 4 }}>
+
+      <Box
+        component="nav"
+        sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}
+        aria-label="mailbox folders"
+      >
+        <Drawer
+          variant="temporary"
+          open={mobileOpen}
+          onClose={handleDrawerToggle}
+          ModalProps={{
+            keepMounted: true, // Better open performance on mobile.
+          }}
+          sx={{
+            display: { xs: 'block', sm: 'none' },
+            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
+          }}
+        >
+          {drawer}
+        </Drawer>
+        <Drawer
+          variant="permanent"
+          sx={{
+            display: { xs: 'none', sm: 'block' },
+            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
+          }}
+          open
+        >
+          {drawer}
+        </Drawer>
+      </Box>
+
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1,
+          p: 3,
+          width: { sm: `calc(100% - ${drawerWidth}px)` },
+          mt: 8, // AppBar height
+        }}
+      >
         {children}
-      </Container>
+      </Box>
+
+      <Menu
+        anchorEl={anchorEl}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'right',
+        }}
+        keepMounted
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'right',
+        }}
+        open={Boolean(anchorEl)}
+        onClose={handleMenuClose}
+      >
+        <MenuItem onClick={() => {
+          handleMenuClose();
+          router.push('/profile');
+        }}>
+          <ListItemIcon>
+            <PersonIcon fontSize="small" />
+          </ListItemIcon>
+          Profile
+        </MenuItem>
+        <MenuItem onClick={handleLogout}>
+          <ListItemIcon>
+            <LogoutIcon fontSize="small" />
+          </ListItemIcon>
+          Logout
+        </MenuItem>
+      </Menu>
     </Box>
   );
 };
 
-export default Layout;
+export default AppLayout;

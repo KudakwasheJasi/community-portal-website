@@ -15,6 +15,8 @@ import {
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import Head from 'next/head';
 import { styled } from '@mui/system';
+import { useAuth } from '@/context/AuthContext';
+import { useRouter } from 'next/router';
 
 interface FormData {
   name: string;
@@ -88,6 +90,8 @@ const Sphere = styled(Box)({
 });
 
 const Register: React.FC = () => {
+  const { register } = useAuth();
+  const router = useRouter();
   const [formData, setFormData] = useState<FormData>({
     name: '',
     email: '',
@@ -99,6 +103,8 @@ const Register: React.FC = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [errors, setErrors] = useState<Partial<FormData>>({});
   const [success, setSuccess] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -124,19 +130,26 @@ const Register: React.FC = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (validate()) {
-      // TODO: Handle registration logic (e.g., API call)
-      console.log('Registration data:', formData);
-      setSuccess(true);
-      setFormData({
-        name: '',
-        email: '',
-        password: '',
-        confirmPassword: '',
-        mobile: '',
-      });
+      setLoading(true);
+      setError('');
+      try {
+        await register(formData.name, formData.email, formData.password, formData.mobile);
+        setSuccess(true);
+        setFormData({
+          name: '',
+          email: '',
+          password: '',
+          confirmPassword: '',
+          mobile: '',
+        });
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : 'Registration failed');
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -172,6 +185,12 @@ const Register: React.FC = () => {
                 {success && (
                   <Alert severity="success" sx={{ mb: 3 }}>
                     Registration successful! You can now sign in.
+                  </Alert>
+                )}
+
+                {error && (
+                  <Alert severity="error" sx={{ mb: 3 }}>
+                    {error}
                   </Alert>
                 )}
                 
@@ -281,6 +300,7 @@ const Register: React.FC = () => {
                     fullWidth
                     variant="contained"
                     size="large"
+                    disabled={loading}
                     sx={{
                       py: 1.5,
                       borderRadius: '8px',
@@ -294,7 +314,7 @@ const Register: React.FC = () => {
                       mb: 2,
                     }}
                   >
-                    Create Account
+                    {loading ? 'Creating Account...' : 'Create Account'}
                   </Button>
                   
                   <Box sx={{ textAlign: 'center', mt: 2 }}>

@@ -1,13 +1,43 @@
 import axios from 'axios';
 import { LoginCredentials, RegisterCredentials, AuthResponse } from '@/types/auth';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+const TOKEN_KEY = 'auth_token';
 
 const api = axios.create({
   baseURL: API_URL,
   headers: {
     'Content-Type': 'application/json',
   },
+});
+
+// Token management
+const getToken = (): string | null => {
+  if (typeof window !== 'undefined') {
+    return localStorage.getItem(TOKEN_KEY);
+  }
+  return null;
+};
+
+const setToken = (token: string): void => {
+  if (typeof window !== 'undefined') {
+    localStorage.setItem(TOKEN_KEY, token);
+  }
+};
+
+const removeToken = (): void => {
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem(TOKEN_KEY);
+  }
+};
+
+// Add request interceptor to include auth token
+api.interceptors.request.use((config) => {
+  const token = getToken();
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
 });
 
 export const authService = {
@@ -27,31 +57,21 @@ export const authService = {
   },
 
   getAuthToken(): string | null {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('token');
-    }
-    return null;
+    return getToken();
   },
 
   setAuthData(data: AuthResponse): void {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('user', JSON.stringify(data.user));
+    if (data.token) {
+      setToken(data.token);
     }
   },
 
   clearAuthData(): void {
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-    }
+    removeToken();
   },
 
   isAuthenticated(): boolean {
-    if (typeof window !== 'undefined') {
-      return !!localStorage.getItem('token');
-    }
-    return false;
+    return !!getToken();
   },
 };
 

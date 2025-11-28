@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
 import { createTheme } from '@mui/material/styles';
@@ -11,11 +11,14 @@ import {
   CardContent,
   CardMedia,
   Button,
-  Container
+  Container,
+  Alert,
+  CircularProgress
 } from '@mui/material';
 import EventBusyIcon from '@mui/icons-material/EventBusy';
 import CheckIcon from '@mui/icons-material/Check';
 import MainDashboardLayout from '@/components/MainDashboardLayout';
+import eventsService, { Event } from '@/services/events.service';
 
 // --- TYPES ---
 export interface EventData {
@@ -103,7 +106,26 @@ const FILTERS: FilterType[] = ['All', 'This Weekend', 'Online', 'Free'];
 const EventsPage = () => {
   const router = useRouter();
   const [activeFilter, setActiveFilter] = useState<FilterType>('All');
-  const [events, setEvents] = useState<EventData[]>(EVENTS);
+  const [events, setEvents] = useState<Event[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    const loadEvents = async () => {
+      try {
+        setLoading(true);
+        setError('');
+        const fetchedEvents = await eventsService.getAll();
+        setEvents(fetchedEvents);
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : 'Failed to load events');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadEvents();
+  }, []);
 
   const featuredEvents = useMemo(() => 
     events.filter(e => e.isFeatured), 
@@ -119,15 +141,27 @@ const EventsPage = () => {
     return filtered;
   }, [events, activeFilter]);
 
-  const handleRegister = useCallback((id: string) => {
-    setEvents(prev => prev.map(event => {
-      if (event.id === id) {
-        const nextStatus = event.status === 'registered' ? 'open' : 'registered';
-        return { ...event, status: nextStatus };
+  const handleRegister = useCallback(async (id: string) => {
+    try {
+      setError('');
+      const currentEvent = events.find(e => e.id === id);
+      if (!currentEvent) return;
+
+      if (currentEvent.status === 'registered') {
+        await eventsService.unregisterFromEvent(id);
+        setEvents(prev => prev.map(event =>
+          event.id === id ? { ...event, status: 'open' } : event
+        ));
+      } else {
+        await eventsService.registerForEvent(id);
+        setEvents(prev => prev.map(event =>
+          event.id === id ? { ...event, status: 'registered' } : event
+        ));
       }
-      return event;
-    }));
-  }, []);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to update registration');
+    }
+  }, [events]);
 
   return (
     <MainDashboardLayout title="Event Registration">
@@ -136,7 +170,19 @@ const EventsPage = () => {
       </Head>
       
       <Box sx={{ p: 3 }}>
-        {/* Featured Events */}
+        {error && (
+          <Alert severity="error" sx={{ mb: 3 }}>
+            {error}
+          </Alert>
+        )}
+
+        {loading ? (
+          <Box sx={{ display: 'flex', justifyContent: 'center', my: 8 }}>
+            <CircularProgress />
+          </Box>
+        ) : (
+          <>
+            {/* Featured Events */}
         {featuredEvents.length > 0 && (
           <FeaturedCarousel
             events={featuredEvents}
@@ -165,6 +211,8 @@ const EventsPage = () => {
           events={listEvents}
           onRegister={handleRegister}
         />
+          </>
+        )}
       </Box>
     </MainDashboardLayout>
   );

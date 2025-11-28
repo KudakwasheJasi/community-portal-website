@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -8,10 +8,19 @@ import {
   Button,
   IconButton,
   Stack,
-  Box
+  Box,
+  Typography
 } from '@mui/material';
-import { Close as CloseIcon } from '@mui/icons-material';
-import { PostFormData } from '@/types/post';
+import { Close as CloseIcon, CloudUpload as CloudUploadIcon } from '@mui/icons-material';
+// PostFormData is defined locally in the posts page
+interface PostFormData {
+  id?: string;
+  title: string;
+  description: string;
+  imageUrl?: string;
+  status?: 'published' | 'draft' | 'archived';
+  file?: File;
+}
 
 interface CreateEditPostDialogProps {
   open: boolean;
@@ -21,12 +30,12 @@ interface CreateEditPostDialogProps {
   title: string;
 }
 
-const CreateEditPostDialog: React.FC<CreateEditPostDialogProps> = ({ 
-  open, 
-  onClose, 
-  onSubmit, 
-  initialData, 
-  title 
+const CreateEditPostDialog: React.FC<CreateEditPostDialogProps> = ({
+  open,
+  onClose,
+  onSubmit,
+  initialData,
+  title
 }) => {
   const [formData, setFormData] = React.useState<PostFormData>({
     id: '',
@@ -36,6 +45,8 @@ const CreateEditPostDialog: React.FC<CreateEditPostDialogProps> = ({
     status: 'draft',
     ...initialData
   });
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   React.useEffect(() => {
     if (initialData) {
@@ -43,6 +54,7 @@ const CreateEditPostDialog: React.FC<CreateEditPostDialogProps> = ({
         ...prev,
         ...initialData
       }));
+      setImagePreview(initialData.imageUrl || null);
     } else {
       // Reset form when creating a new post
       setFormData({
@@ -52,6 +64,8 @@ const CreateEditPostDialog: React.FC<CreateEditPostDialogProps> = ({
         imageUrl: '',
         status: 'draft'
       });
+      setSelectedFile(null);
+      setImagePreview(null);
     }
   }, [initialData, open]);
 
@@ -63,9 +77,21 @@ const CreateEditPostDialog: React.FC<CreateEditPostDialogProps> = ({
     }));
   };
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setSelectedFile(file);
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setImagePreview(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(formData);
+    onSubmit({ ...formData, file: selectedFile || undefined });
   };
 
   return (
@@ -108,16 +134,39 @@ const CreateEditPostDialog: React.FC<CreateEditPostDialogProps> = ({
               margin="normal"
               variant="outlined"
             />
-            <TextField
-              name="imageUrl"
-              label="Image URL"
-              value={formData.imageUrl || ''}
-              onChange={handleChange}
-              fullWidth
-              margin="normal"
-              variant="outlined"
-              placeholder="https://example.com/image.jpg"
-            />
+            <Box>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                Image (optional)
+              </Typography>
+              <Button
+                variant="outlined"
+                component="label"
+                startIcon={<CloudUploadIcon />}
+                sx={{ mb: 2 }}
+              >
+                Choose Image
+                <input
+                  type="file"
+                  hidden
+                  accept="image/*"
+                  onChange={handleFileChange}
+                />
+              </Button>
+              {selectedFile && (
+                <Typography variant="body2" color="text.secondary">
+                  Selected: {selectedFile.name}
+                </Typography>
+              )}
+              {imagePreview && (
+                <Box sx={{ mt: 2 }}>
+                  <img
+                    src={imagePreview}
+                    alt="Preview"
+                    style={{ maxWidth: '100%', maxHeight: '200px', objectFit: 'cover' }}
+                  />
+                </Box>
+              )}
+            </Box>
           </Stack>
         </DialogContent>
         <DialogActions sx={{ p: 2 }}>
