@@ -48,8 +48,7 @@ import postsService, { Post, CreatePostData, UpdatePostData } from '@/services/p
 interface PostFormData {
   id?: string;
   title: string;
-  description: string;
-  imageUrl?: string;
+  content: string;
   status?: 'published' | 'draft' | 'archived';
   file?: File;
 }
@@ -204,8 +203,7 @@ const PostsPage: React.FC = () => {
         const updatedPost = await postsService.update(data.id!, {
           id: data.id,
           title: data.title,
-          description: data.description,
-          imageUrl: data.imageUrl,
+          content: data.content,
           status: data.status
         }, data.file);
         setPosts(prev =>
@@ -217,8 +215,7 @@ const PostsPage: React.FC = () => {
         // Create new post
         const newPost = await postsService.create({
           title: data.title,
-          description: data.description,
-          imageUrl: data.imageUrl,
+          content: data.content,
           status: data.status
         }, data.file);
         setPosts(prev => [newPost, ...prev]);
@@ -588,8 +585,8 @@ const PostsPage: React.FC = () => {
                                 flexShrink: 0
                               }}
                             >
-                              <img 
-                                src={post.imageUrl} 
+                              <img
+                                src={post.featuredImage ? `http://localhost:3000${post.featuredImage}` : post.imageUrl}
                                 alt={post.title}
                                 style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                               />

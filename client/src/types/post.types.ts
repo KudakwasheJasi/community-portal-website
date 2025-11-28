@@ -36,6 +36,7 @@ export interface Post {
   content: string;
   excerpt?: string;
   featuredImage?: string;
+  images?: string[];
   status: PostStatus;
   visibility: PostVisibility;
   viewCount: number;
@@ -47,6 +48,10 @@ export interface Post {
   author: User;
   categories?: Category[];
   tags?: Tag[];
+  // Legacy fields for backward compatibility
+  imageUrl?: string;
+  date?: string;
+  authorName?: string;
 }
 
 export interface CreatePostDto {

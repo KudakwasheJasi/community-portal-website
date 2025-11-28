@@ -6,13 +6,37 @@ import { User } from '../users/user.entity';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { PostQueryDto } from './post-query.dto';
+import { File } from '../files/file.entity';
+import { join } from 'path';
+import { existsSync, mkdirSync } from 'fs';
+import { v4 as uuidv4 } from 'uuid';
+import { FileType } from '../files/file.entity';
 
 @Injectable()
 export class PostsService {
   constructor(
     @InjectRepository(Post)
     private postRepository: Repository<Post>,
+    @InjectRepository(File)
+    private fileRepository: Repository<File>,
   ) {}
+
+  private async saveUploadedFile(file: Express.Multer.File, userId: string): Promise<string> {
+    const uploadDir = join(__dirname, '..', 'uploads');
+    if (!existsSync(uploadDir)) {
+      mkdirSync(uploadDir, { recursive: true });
+    }
+
+    const fileExtension = file.originalname.split('.').pop();
+    const fileName = `${uuidv4()}.${fileExtension}`;
+    const filePath = join(uploadDir, fileName);
+
+    // Save file to disk
+    const fs = require('fs');
+    fs.writeFileSync(filePath, file.buffer);
+
+    return fileName;
+  }
 
   async findAll(query: PostQueryDto) {
     try {
@@ -121,8 +145,8 @@ export class PostsService {
       const post = this.postRepository.create(postDataWithAuthor);
 
       if (file) {
-        // Handle file upload (you'll need to implement this)
-        // post.featuredImage = await this.fileService.uploadFile(file);
+        const fileName = await this.saveUploadedFile(file, authorId);
+        postDataWithAuthor.featuredImage = `/uploads/${fileName}`;
       }
 
       return await this.postRepository.save(post);
@@ -136,17 +160,14 @@ export class PostsService {
       const { file, ...updateData } = updatePostDto;
       const post = await this.findOne(id);
 
-      // Handle file upload if a new file is provided
-      if (file) {
-        // Delete old file if exists
-        // if (post.featuredImage) {
-        //   await this.fileService.deleteFile(post.featuredImage);
-        // }
-        // post.featuredImage = await this.fileService.uploadFile(file);
-      }
-
       // Create a new object for the updated data with proper typing
       const updatedData: Partial<Post> = { ...updateData };
+
+      // Handle file upload if a new file is provided
+      if (file) {
+        const fileName = await this.saveUploadedFile(file, post.authorId);
+        updatedData.featuredImage = `/uploads/${fileName}`;
+      }
 
       // Update status timestamp if status changed to PUBLISHED
       if (updateData.status === PostStatus.PUBLISHED && post.status !== PostStatus.PUBLISHED) {

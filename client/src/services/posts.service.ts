@@ -21,20 +21,31 @@ api.interceptors.request.use((config) => {
 export interface Post {
   id: string;
   title: string;
-  description: string;
-  imageUrl?: string;
-  date: string;
+  content: string;
+  featuredImage?: string;
   status: 'published' | 'draft' | 'archived';
-  views: number;
-  author: string;
-  tags: string[];
+  viewCount: number;
+  author: {
+    id: string;
+    username: string;
+    email: string;
+  };
+  createdAt: string;
+  updatedAt: string;
+  // Legacy fields for backward compatibility
+  description?: string;
+  imageUrl?: string;
+  date?: string;
+  views?: number;
+  tags?: string[];
 }
 
 export interface CreatePostData {
   title: string;
-  description: string;
-  imageUrl?: string;
+  content: string;
   status?: 'published' | 'draft' | 'archived';
+  // For file upload
+  file?: File;
 }
 
 export interface UpdatePostData extends CreatePostData {
@@ -62,8 +73,7 @@ export const postsService = {
   async create(data: CreatePostData, file?: File): Promise<Post> {
     const formData = new FormData();
     formData.append('title', data.title);
-    formData.append('description', data.description);
-    if (data.imageUrl) formData.append('imageUrl', data.imageUrl);
+    formData.append('content', data.content);
     if (data.status) formData.append('status', data.status);
     if (file) formData.append('file', file);
 
@@ -78,8 +88,7 @@ export const postsService = {
   async update(id: string, data: UpdatePostData, file?: File): Promise<Post> {
     const formData = new FormData();
     formData.append('title', data.title);
-    formData.append('description', data.description);
-    if (data.imageUrl) formData.append('imageUrl', data.imageUrl);
+    formData.append('content', data.content);
     if (data.status) formData.append('status', data.status);
     if (file) formData.append('file', file);
 
