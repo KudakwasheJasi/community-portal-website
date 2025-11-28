@@ -11,11 +11,11 @@ import {
   JoinTable,
   Index,
 } from 'typeorm';
-import { User } from '../users/user.entity.js';
-import { Comment } from '../comments/comment.entity.js';
-import { Like } from '../likes/like.entity.js';
-import { Category } from '../categories/category.entity.js';
-import { Tag } from '../tags/tag.entity.js';
+import { User } from '../users/user.entity';
+import { Comment } from '../comments/comment.entity';
+import { Like } from '../likes/like.entity';
+import { Category } from '../categories/category.entity';
+import { Tag } from '../tags/tag.entity';
 
 export enum PostStatus {
   DRAFT = 'draft',

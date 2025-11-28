@@ -10,8 +10,8 @@ import {
   UploadedFile,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { PostsService } from './posts.service.js';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
+import { PostsService } from './posts.service';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 interface AuthenticatedRequest extends Request {
   user: { id: string };
