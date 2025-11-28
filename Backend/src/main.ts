@@ -9,23 +9,26 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
   const port = configService.get<number>('PORT') || 3000;
   const nodeEnv = configService.get<string>('NODE_ENV') || 'development';
-  const frontendUrl = configService.get<string>('FRONTEND_URL') || 'http://localhost:3000';
+  const frontendUrl =
+    configService.get<string>('FRONTEND_URL') || 'http://localhost:3000';
 
   // Enable CORS
   app.enableCors({
-    origin: frontendUrl,
+    origin: ['http://localhost:3000', 'http://localhost:3001'],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
   });
 
   // Global validation pipe
-  app.useGlobalPipes(new ValidationPipe({
-    whitelist: true,
-    transform: true,
-    transformOptions: {
-      enableImplicitConversion: true,
-    },
-  }));
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      transform: true,
+      transformOptions: {
+        enableImplicitConversion: true,
+      },
+    }),
+  );
 
   // Swagger Documentation
   const config = new DocumentBuilder()
@@ -34,18 +37,20 @@ async function bootstrap() {
     .setVersion('1.0')
     .addBearerAuth()
     .build();
-  
+
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
   await app.listen(port);
-  
-  console.log(`🚀 Application is running on: http://localhost:${port} in ${nodeEnv} mode`);
+
+  console.log(
+    `🚀 Application is running on: http://localhost:${port} in ${nodeEnv} mode`,
+  );
   console.log(`🌐 Frontend URL: ${frontendUrl}`);
   console.log(`📚 API Documentation: http://localhost:${port}/api`);
 }
 
-bootstrap().catch(err => {
+bootstrap().catch((err) => {
   console.error('Failed to start application:', err);
   process.exit(1);
 });

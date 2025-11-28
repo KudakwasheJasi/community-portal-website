@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useRouter } from 'next/router';
-import authService, { AuthResponse } from '@/services/auth.service';
-import { User } from '@/types/auth';
+import authService from '@/services/auth.service';
+import { User, AuthResponse } from '@/types/auth';
 
 interface AuthContextType {
   user: User | null;
@@ -36,6 +36,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const handleAuthResponse = (data: AuthResponse) => {
     authService.setAuthData(data);
+    localStorage.setItem('user', JSON.stringify(data.user));
     setUser(data.user);
   };
 
@@ -69,6 +70,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const logout = () => {
     authService.clearAuthData();
+    localStorage.removeItem('user');
     setUser(null);
     router.push('/login');
   };
