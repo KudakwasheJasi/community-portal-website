@@ -2,43 +2,130 @@ import {
   Controller,
   Get,
   Post,
+  Put,
+  Delete,
   Body,
   Param,
   UseGuards,
   Request,
   UseInterceptors,
   UploadedFile,
+  Query,
+  ParseIntPipe,
+  BadRequestException,
+  NotFoundException,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { PostsService } from './posts.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { CreatePostDto } from './dto/create-post.dto';
+import { UpdatePostDto } from './dto/update-post.dto';
+import { PostQueryDto } from './post-query.dto';
 
 interface AuthenticatedRequest extends Request {
-  user: { id: string };
+  user: { id: string; username: string };
 }
 
 @Controller('posts')
+@UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
 export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 
   @Get()
-  findAll() {
-    return this.postsService.findAll();
+  async findAll(@Query() query: PostQueryDto) {
+    try {
+      return await this.postsService.findAll(query);
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.postsService.findOne(id);
+  async findOne(@Param('id') id: string) {
+    try {
+      const post = await this.postsService.findOne(id);
+      if (!post) {
+        throw new NotFoundException('Post not found');
+      }
+      return post;
+    } catch (error) {
+      if (error instanceof NotFoundException) throw error;
+      throw new BadRequestException('Invalid post ID');
+    }
   }
 
   @UseGuards(JwtAuthGuard)
   @Post()
   @UseInterceptors(FileInterceptor('file'))
-  create(
-    @Body() createPostDto: any,
+  async create(
+    @Body() createPostDto: CreatePostDto,
     @UploadedFile() file: Express.Multer.File,
-    @Request() req: AuthenticatedRequest, // Assuming AuthenticatedRequest extends ExpressRequest and has a user property
+    @Request() req: AuthenticatedRequest,
   ) {
-    return this.postsService.create(createPostDto, file, req.user.id);
+    try {
+      return await this.postsService.create({
+        ...createPostDto,
+        authorId: req.user.id,
+        file,
+      });
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Put(':id')
+  @UseInterceptors(FileInterceptor('file'))
+  async update(
+    @Param('id') id: string,
+    @Body() updatePostDto: UpdatePostDto,
+    @UploadedFile() file: Express.Multer.File,
+    @Request() req: AuthenticatedRequest,
+  ) {
+    try {
+      // Verify post exists and user is the author
+      const post = await this.postsService.findOne(id);
+      if (!post) {
+        throw new NotFoundException('Post not found');
+      }
+      if (post.authorId !== req.user.id) {
+        throw new BadRequestException('Not authorized to update this post');
+      }
+
+      return await this.postsService.update(id, {
+        ...updatePostDto,
+        file,
+      });
+    } catch (error) {
+      if (error instanceof NotFoundException || error instanceof BadRequestException) {
+        throw error;
+      }
+      throw new BadRequestException('Failed to update post');
+    }
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete(':id')
+  async remove(@Param('id') id: string, @Request() req: AuthenticatedRequest) {
+    try {
+      // Verify post exists and user is the author
+      const post = await this.postsService.findOne(id);
+      if (!post) {
+        throw new NotFoundException('Post not found');
+      }
+      if (post.authorId !== req.user.id) {
+        throw new BadRequestException('Not authorized to delete this post');
+      }
+
+      await this.postsService.remove(id);
+      return { message: 'Post deleted successfully' };
+    } catch (error) {
+      if (error instanceof NotFoundException || error instanceof BadRequestException) {
+        throw error;
+      }
+      throw new BadRequestException('Failed to delete post');
+    }
   }
 }
