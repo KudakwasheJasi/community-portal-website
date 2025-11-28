@@ -3,7 +3,7 @@ import { Box, AppBar, Toolbar, IconButton, Typography, useTheme, useMediaQuery, 
 import MenuIcon from '@mui/icons-material/Menu';
 import SearchIcon from '@mui/icons-material/Search';
 import NotificationsIcon from '@mui/icons-material/Notifications';
-import Sidebar from './Sidebar';
+import MainNavigationSidebar from './MainNavigationSidebar';
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -50,7 +50,7 @@ interface DashboardLayoutProps {
   title?: string;
 }
 
-const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, title = 'Dashboard' }) => {
+const MainDashboardLayout: React.FC<DashboardLayoutProps> = ({ children, title = 'Dashboard' }) => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
@@ -61,7 +61,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, title = 'Da
 
   return (
     <Box sx={{ display: 'flex', minHeight: '100vh' }}>
-      <Sidebar mobileOpen={mobileOpen} handleDrawerToggle={handleDrawerToggle} />
+      <MainNavigationSidebar open={mobileOpen} onClose={handleDrawerToggle} />
       
       <Box
         component="main"
@@ -109,4 +109,4 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, title = 'Da
   );
 };
 
-export default DashboardLayout;
+export default MainDashboardLayout;

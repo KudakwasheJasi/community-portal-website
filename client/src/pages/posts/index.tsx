@@ -39,8 +39,8 @@ import {
   GridView as GridViewIcon,
   Visibility as VisibilityIcon
 } from '@mui/icons-material';
-import DashboardLayout from '@/components/DashboardLayout';
-import PostFormDialog from '@/components/posts/PostFormDialog';
+import MainDashboardLayout from '@/components/MainDashboardLayout';
+import CreateEditPostDialog from '@/components/posts/CreateEditPostDialog';
 import { Post, PostFormData } from '@/types/post';
 import { useTheme } from '@mui/material/styles';
 
@@ -215,7 +215,7 @@ const PostsPage: React.FC = () => {
   };
 
   return (
-    <DashboardLayout title="Post Management">
+    <MainDashboardLayout title="Posts Management">
       <Container maxWidth="xl" sx={{ py: 3 }}>
         <Box>
           {/* Header Section */}
@@ -674,7 +674,7 @@ const PostsPage: React.FC = () => {
           </Paper>
         )}
 
-        <PostFormDialog
+        <CreateEditPostDialog
           open={dialogOpen}
           onClose={() => setDialogOpen(false)}
           onSubmit={handleSave}
@@ -683,7 +683,7 @@ const PostsPage: React.FC = () => {
         />
       </Box>
     </Container>
-  </DashboardLayout>
+  </MainDashboardLayout>
   );
 };
 

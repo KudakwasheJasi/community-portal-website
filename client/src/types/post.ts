@@ -16,4 +16,5 @@ export interface PostFormData {
   title: string;
   description: string;
   imageUrl: string;
+  status?: 'published' | 'draft' | 'archived';
 }

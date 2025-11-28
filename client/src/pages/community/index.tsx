@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, Typography, Grid, Card, CardContent, Avatar, Button } from '@mui/material';
 import { People as PeopleIcon, GroupAdd as GroupAddIcon } from '@mui/icons-material';
-import DashboardLayout from '@/components/DashboardLayout';
+import MainDashboardLayout from '@/components/MainDashboardLayout';
 
 const Community: React.FC = () => {
   // Mock community data - in a real app, this would come from an API
@@ -18,7 +18,7 @@ const Community: React.FC = () => {
   ];
 
   return (
-    <DashboardLayout title="Community">
+    <MainDashboardLayout title="Community">
       <Box sx={{ p: 3 }}>
         <Typography variant="h4" component="h1" gutterBottom>
           Community
@@ -73,7 +73,7 @@ const Community: React.FC = () => {
           ))}
         </Grid>
       </Box>
-    </DashboardLayout>
+    </MainDashboardLayout>
   );
 };
 

@@ -15,7 +15,7 @@ import {
 } from '@mui/material';
 import EventBusyIcon from '@mui/icons-material/EventBusy';
 import CheckIcon from '@mui/icons-material/Check';
-import DashboardLayout from '@/components/DashboardLayout';
+import MainDashboardLayout from '@/components/MainDashboardLayout';
 
 // --- TYPES ---
 export interface EventData {
@@ -130,7 +130,7 @@ const EventsPage = () => {
   }, []);
 
   return (
-    <DashboardLayout title="Event Registration">
+    <MainDashboardLayout title="Event Registration">
       <Head>
         <title>Event Registration | Community Portal</title>
       </Head>
@@ -166,7 +166,7 @@ const EventsPage = () => {
           onRegister={handleRegister}
         />
       </Box>
-    </DashboardLayout>
+    </MainDashboardLayout>
   );
 };
 

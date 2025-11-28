@@ -4,11 +4,11 @@
 import React from 'react';
 import dynamic from 'next/dynamic';
 import { Box, CircularProgress } from '@mui/material';
-import DashboardLayout from '@/components/DashboardLayout';
+import MainDashboardLayout from '@/components/MainDashboardLayout';
 
 // Use dynamic import for better performance
-const AdvancedDashboard = dynamic(
-  () => import('@/components/dashboard/AdvancedDashboard'),
+const DashboardAnalyticsView = dynamic(
+  () => import('@/components/dashboard/DashboardAnalyticsView'),
   { 
     loading: () => (
       <Box 
@@ -25,9 +25,9 @@ const AdvancedDashboard = dynamic(
 
 const DashboardPage = () => {
   return (
-    <DashboardLayout>
-      <AdvancedDashboard />
-    </DashboardLayout>
+    <MainDashboardLayout title="Dashboard">
+      <DashboardAnalyticsView />
+    </MainDashboardLayout>
   );
 };
 

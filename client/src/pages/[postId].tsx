@@ -9,7 +9,7 @@ import {
 } from '@mui/material';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import DashboardLayout from '@/components/DashboardLayout';
+import MainDashboardLayout from '@/components/MainDashboardLayout';
 import { PhotoCamera } from '@mui/icons-material';
 
 // --- Mock Data Fetching ---
@@ -84,11 +84,11 @@ const EditPost: React.FC = () => {
   };
 
   if (loading) {
-    return <DashboardLayout><Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}><CircularProgress /></Box></DashboardLayout>;
+    return <MainDashboardLayout><Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}><CircularProgress /></Box></MainDashboardLayout>;
   }
 
   return (
-    <DashboardLayout title="Edit Post">
+    <MainDashboardLayout title="Edit Post">
       <Head>
         <title>Edit Post - Community Portal</title>
       </Head>
@@ -132,7 +132,7 @@ const EditPost: React.FC = () => {
           </Box>
         </Box>
       </Paper>
-    </DashboardLayout>
+    </MainDashboardLayout>
   );
 };
 
