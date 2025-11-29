@@ -9,7 +9,6 @@ import { PostQueryDto } from './post-query.dto';
 import { File } from '../files/file.entity';
 import { join } from 'path';
 import { existsSync, mkdirSync } from 'fs';
-import { v4 as uuidv4 } from 'uuid';
 import { FileType } from '../files/file.entity';
 
 @Injectable()
@@ -27,6 +26,7 @@ export class PostsService {
       mkdirSync(uploadDir, { recursive: true });
     }
 
+    const { v4: uuidv4 } = await import('uuid');
     const fileExtension = file.originalname.split('.').pop();
     const fileName = `${uuidv4()}.${fileExtension}`;
     const filePath = join(uploadDir, fileName);

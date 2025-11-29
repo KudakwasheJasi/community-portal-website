@@ -9,8 +9,7 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
   const port = configService.get<number>('PORT') || 3000;
   const nodeEnv = configService.get<string>('NODE_ENV') || 'development';
-  const frontendUrl =
-    configService.get<string>('FRONTEND_URL') || 'http://localhost:3000';
+  const frontendUrl = configService.get<string>('FRONTEND_URL') || 'http://localhost:3000';
 
   // Enable CORS
   app.enableCors({
@@ -18,6 +17,9 @@ async function bootstrap() {
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
   });
+
+  // Set global prefix before Swagger setup
+  app.setGlobalPrefix('api');
 
   // Global validation pipe
   app.useGlobalPipes(

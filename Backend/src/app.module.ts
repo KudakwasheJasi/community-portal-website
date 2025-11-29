@@ -6,44 +6,51 @@ import { join } from 'path';
 import { AppController } from './app.controller.js';
 import { AppService } from './app.service.js';
 import configuration from './config/configuration.js';
+import { PostsModule } from './posts/posts.module.js';
+import { EventsModule } from './events/events.module.js';
+import { UsersModule } from './users/users.module.js';
+import { AuthModule } from './auth/auth.module.js';
 
 @Module({
   imports: [
-    ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'uploads'),
-      serveRoot: '/uploads',
-    }),
+    // Core modules
     ConfigModule.forRoot({
       isGlobal: true,
       load: [configuration],
       envFilePath: `.env.${process.env.NODE_ENV || 'development'}`,
     }),
+    
+    // Database - PostgreSQL Configuration
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: (configService: ConfigService): TypeOrmModuleOptions => {
-        const isPostgres = configService.get('DB_TYPE') === 'postgres';
-        
-        if (isPostgres) {
-          return {
-            type: 'postgres',
-            url: configService.get('DATABASE_URL'),
-            entities: [__dirname + '/**/*.entity{.ts,.js}'],
-            synchronize: configService.get('DB_SYNCHRONIZE', configService.get('NODE_ENV') !== 'production'),
-            logging: configService.get('DB_LOGGING', configService.get('NODE_ENV') === 'development'),
-            ssl: { rejectUnauthorized: false }
-          } as TypeOrmModuleOptions;
-        } else {
-          return {
-            type: 'better-sqlite3',
-            database: configService.get('DB_DATABASE', './database.sqlite'),
-            entities: [__dirname + '/**/*.entity{.ts,.js}'],
-            synchronize: configService.get('DB_SYNCHRONIZE', configService.get('NODE_ENV') !== 'production'),
-            logging: configService.get('DB_LOGGING', configService.get('NODE_ENV') === 'development'),
-          } as TypeOrmModuleOptions;
-        }
-      },
+      useFactory: (configService: ConfigService): TypeOrmModuleOptions => ({
+        type: 'postgres',
+        host: configService.get('DB_HOST', 'localhost'),
+        port: configService.get<number>('DB_PORT', 5432),
+        username: configService.get('DB_USERNAME', 'postgres'),
+        password: configService.get('DB_PASSWORD', ''),
+        database: configService.get('DB_DATABASE', 'community_portal'),
+        entities: [__dirname + '/**/*.entity{.ts,.js}'],
+        synchronize: configService.get('DB_SYNCHRONIZE', true),
+        logging: configService.get('DB_LOGGING', true),
+        ssl: configService.get('NODE_ENV') === 'production' 
+          ? { rejectUnauthorized: false } 
+          : false,
+      }),
       inject: [ConfigService],
     }),
+
+    // Static files
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'uploads'),
+      serveRoot: '/uploads',
+    }),
+
+    // Feature modules
+    AuthModule,
+    UsersModule,
+    PostsModule,
+    EventsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -11,7 +11,6 @@
     "target": "ES2022",
     "sourceMap": true,
     "outDir": "./dist",
-    "baseUrl": ".",
     "skipLibCheck": true,
     "strictNullChecks": true,
     "forceConsistentCasingInFileNames": true,
@@ -19,6 +18,9 @@
     "strictBindCallApply": false,
     "noFallthroughCasesInSwitch": false,
     "rootDir": "./src",
+    "baseUrl": "",
+    "ignoreDeprecations": "5.0",
+    "types": ["node", "jest", "express", "multer"],
     "paths": {
       "@/*": ["src/*"]
     }

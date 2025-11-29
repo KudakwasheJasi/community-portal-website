@@ -80,7 +80,7 @@ export class Post {
   @Column('uuid')
   authorId: string;
 
-  @ManyToOne(() => User, (user: User) => user.posts as Post[], {
+  @ManyToOne(() => User, (user: User) => user.posts, {
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'authorId' })

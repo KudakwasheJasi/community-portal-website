@@ -33,33 +33,18 @@ export class User {
   @Column({ nullable: true })
   avatar?: string;
 
-  @Column({ 
+  @Column({
     type: 'varchar',
     length: 20,
-    default: UserRole.USER 
+    default: UserRole.USER
   })
   role: UserRole;
 
   @Column({ default: false })
   isEmailVerified: boolean;
 
-  @Column({ nullable: true })
-  emailVerificationToken: string;
-
-  @Column({ nullable: true })
-  passwordResetToken: string;
-
-  @Column({ nullable: true })
-  passwordResetExpires: Date;
-
   @Column({ default: true })
   isActive: boolean;
-
-  @Column({ nullable: true })
-  lastLogin: Date;
-
-  @Column('simple-array', { nullable: true })
-  preferences: string[];
 
   // Relations
   @OneToMany(() => Post, post => post.author)
