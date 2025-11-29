@@ -1,4 +1,13 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn, OneToMany, Index } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+  ManyToOne,
+  JoinColumn,
+  OneToMany,
+} from 'typeorm';
 import { User } from '../users/user.entity.ts';
 import { EventRegistration } from './event-registration.entity.ts';
 
@@ -28,11 +37,13 @@ export class Event {
   @Column('uuid')
   organizerId: string;
 
-  @ManyToOne(() => User, user => user.organizedEvents, { onDelete: 'CASCADE' })
+  @ManyToOne(() => User, (user) => user.organizedEvents, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'organizerId' })
   organizer: User;
 
-  @OneToMany(() => EventRegistration, registration => registration.event)
+  @OneToMany(() => EventRegistration, (registration) => registration.event)
   registrations: EventRegistration[];
 
   @CreateDateColumn()

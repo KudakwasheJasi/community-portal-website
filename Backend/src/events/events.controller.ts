@@ -1,25 +1,29 @@
-import { 
-  Controller, 
-  Get, 
-  Post, 
-  Body, 
-  Patch, 
-  Param, 
-  Delete, 
-  UseGuards, 
-  Request, 
-  ParseUUIDPipe, 
-  UseInterceptors, 
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  Request,
+  ParseUUIDPipe,
+  UseInterceptors,
   ClassSerializerInterceptor,
-  HttpCode,
-  HttpStatus,
-  Logger
+  Logger,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard.ts';
 import { EventsService } from './events.service.ts';
 import { Event } from './event.entity.ts';
 import { EventRegistration } from './event-registration.entity.ts';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import { User } from '../users/user.entity.ts';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 
 @ApiTags('events')
 @Controller('events')
@@ -46,13 +50,18 @@ export class EventsController {
 
   @Get('organizer/:organizerId')
   @UseGuards(JwtAuthGuard)
-  findByOrganizer(@Param('organizerId', ParseUUIDPipe) organizerId: string): Promise<Event[]> {
+  findByOrganizer(
+    @Param('organizerId', ParseUUIDPipe) organizerId: string,
+  ): Promise<Event[]> {
     return this.eventsService.findByOrganizer(organizerId);
   }
 
   @Post()
   @UseGuards(JwtAuthGuard)
-  create(@Body() createEventData: Partial<Event>, @Request() req): Promise<Event> {
+  create(
+    @Body() createEventData: Partial<Event>,
+    @Request() req: { user: User },
+  ): Promise<Event> {
     return this.eventsService.create({
       ...createEventData,
       organizerId: req.user.id,
@@ -61,7 +70,10 @@ export class EventsController {
 
   @Patch(':id')
   @UseGuards(JwtAuthGuard)
-  update(@Param('id', ParseUUIDPipe) id: string, @Body() updateData: Partial<Event>): Promise<Event> {
+  update(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() updateData: Partial<Event>,
+  ): Promise<Event> {
     return this.eventsService.update(id, updateData);
   }
 
@@ -73,25 +85,35 @@ export class EventsController {
 
   @Post(':id/register')
   @UseGuards(JwtAuthGuard)
-  registerForEvent(@Param('id', ParseUUIDPipe) eventId: string, @Request() req): Promise<EventRegistration> {
+  registerForEvent(
+    @Param('id', ParseUUIDPipe) eventId: string,
+    @Request() req: { user: User },
+  ): Promise<EventRegistration> {
     return this.eventsService.registerForEvent(eventId, req.user.id);
   }
 
   @Delete(':id/register')
   @UseGuards(JwtAuthGuard)
-  unregisterFromEvent(@Param('id', ParseUUIDPipe) eventId: string, @Request() req): Promise<void> {
+  unregisterFromEvent(
+    @Param('id', ParseUUIDPipe) eventId: string,
+    @Request() req: { user: User },
+  ): Promise<void> {
     return this.eventsService.unregisterFromEvent(eventId, req.user.id);
   }
 
   @Get(':id/registrations')
   @UseGuards(JwtAuthGuard)
-  getEventRegistrations(@Param('id', ParseUUIDPipe) eventId: string): Promise<EventRegistration[]> {
+  getEventRegistrations(
+    @Param('id', ParseUUIDPipe) eventId: string,
+  ): Promise<EventRegistration[]> {
     return this.eventsService.getEventRegistrations(eventId);
   }
 
   @Get('user/registrations')
   @UseGuards(JwtAuthGuard)
-  getUserRegistrations(@Request() req): Promise<EventRegistration[]> {
+  getUserRegistrations(
+    @Request() req: { user: User },
+  ): Promise<EventRegistration[]> {
     return this.eventsService.getUserRegistrations(req.user.id);
   }
 }

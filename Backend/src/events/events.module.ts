@@ -6,9 +6,7 @@ import { EventsController } from './events.controller.ts';
 import { EventsService } from './events.service.ts';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Event, EventRegistration]),
-  ],
+  imports: [TypeOrmModule.forFeature([Event, EventRegistration])],
   controllers: [EventsController],
   providers: [EventsService],
   exports: [EventsService],

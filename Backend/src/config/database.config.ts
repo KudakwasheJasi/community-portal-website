@@ -1,9 +1,11 @@
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
 
-export const databaseConfig = (configService: ConfigService): TypeOrmModuleOptions => {
+export const databaseConfig = (
+  configService: ConfigService,
+): TypeOrmModuleOptions => {
   const isProduction = configService.get('NODE_ENV') === 'production';
-  
+
   if (isProduction) {
     return {
       type: 'postgres',
@@ -11,8 +13,8 @@ export const databaseConfig = (configService: ConfigService): TypeOrmModuleOptio
       entities: [__dirname + '/../**/*.entity{.ts,.js}'],
       synchronize: false, // Should be false in production
       ssl: {
-        rejectUnauthorized: false // For production, you might want to configure this properly
-      }
+        rejectUnauthorized: false, // For production, you might want to configure this properly
+      },
     };
   } else {
     return {

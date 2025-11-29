@@ -1,5 +1,11 @@
 // backend/src/posts/dto/post-query.dto.ts
-import { IsOptional, IsEnum, IsNumber, IsString, IsUUID } from 'class-validator';
+import {
+  IsOptional,
+  IsEnum,
+  IsNumber,
+  IsString,
+  IsUUID,
+} from 'class-validator';
 import { PostStatus, PostVisibility } from './post.entity';
 import { Transform, Type } from 'class-transformer';
 
@@ -26,7 +32,7 @@ export class PostQueryDto {
 
   @IsOptional()
   @IsEnum(PostVisibility)
-  @Transform(({ value }) => (Array.isArray(value) ? value : [value]))
+  @Transform(({ value }) => (Array.isArray(value) ? value : [value]) as PostVisibility[])
   visibility?: PostVisibility[];
 
   // Relationships
@@ -49,7 +55,7 @@ export class PostQueryDto {
 
   @IsOptional()
   @IsString()
-  @Transform(({ value }) => value?.toUpperCase() === 'ASC' ? 'ASC' : 'DESC')
+  @Transform(({ value }) => ((value as string)?.toUpperCase() === 'ASC' ? 'ASC' : 'DESC'))
   order?: 'ASC' | 'DESC' = 'DESC';
 
   // Include relations

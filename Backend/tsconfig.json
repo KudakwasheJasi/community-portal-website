@@ -21,8 +21,7 @@
     "strictBindCallApply": false,
     "noFallthroughCasesInSwitch": false,
     "rootDir": "./src", // The base directory for resolving non-relative module names.
-    "baseUrl": "./", // Option 'baseUrl' is deprecated and will stop functioning in TypeScript 7.0.
-    "ignoreDeprecations": "6.0",
+    "baseUrl": "./",
     "allowImportingTsExtensions": true,
     "types": ["node", "jest", "express", "multer"],
     "paths": {

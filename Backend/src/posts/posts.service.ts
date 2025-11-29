@@ -32,18 +32,25 @@ export class PostsService {
       const where: any = {};
 
       if (status) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         where.status = status;
       }
       if (visibility) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         where.visibility = visibility;
       }
-      if (authorId) where.authorId = authorId;
+      if (authorId) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        where.authorId = authorId;
+      }
 
       if (search) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         where.title = TypeOrmLike(`%${search}%`);
       }
 
       const options: FindManyOptions<Post> = {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         where,
         relations: ['author'],
         order: { createdAt: 'DESC' },
@@ -60,7 +67,7 @@ export class PostsService {
         limit: +limit,
         totalPages: Math.ceil(total / limit),
       };
-    } catch (error) {
+    } catch {
       throw new BadRequestException('Failed to fetch posts');
     }
   }
@@ -87,13 +94,15 @@ export class PostsService {
     }
   }
 
-  async create(createPostDto: CreatePostDto & { authorId: string }): Promise<Post> {
+  async create(
+    createPostDto: CreatePostDto & { authorId: string },
+  ): Promise<Post> {
     try {
       const { authorId, ...postData } = createPostDto;
 
       const postDataWithAuthor = {
         ...postData,
-        author: { id: authorId }
+        author: { id: authorId },
       };
 
       if (postData.status && postData.status === PostStatus.PUBLISHED) {
@@ -103,7 +112,7 @@ export class PostsService {
       const post = this.postRepository.create(postDataWithAuthor);
 
       return await this.postRepository.save(post);
-    } catch (error) {
+    } catch {
       throw new BadRequestException('Failed to create post');
     }
   }
@@ -117,7 +126,10 @@ export class PostsService {
       const updatedData: Partial<Post> = { ...updateData };
 
       // Update status timestamp if status changed to PUBLISHED
-      if (updateData.status === PostStatus.PUBLISHED && post.status !== PostStatus.PUBLISHED) {
+      if (
+        updateData.status === PostStatus.PUBLISHED &&
+        post.status !== PostStatus.PUBLISHED
+      ) {
         updatedData.publishedAt = new Date();
       }
 
@@ -132,7 +144,7 @@ export class PostsService {
   async remove(id: string): Promise<void> {
     try {
       const post = await this.findOne(id);
-      
+
       // Delete associated file if exists
       // if (post.featuredImage) {
       //   await this.fileService.deleteFile(post.featuredImage);
@@ -159,7 +171,7 @@ export class PostsService {
       where: { id: postId },
       relations: ['comments'],
     });
-    
+
     if (post) {
       post.commentCount = post.comments?.length || 0;
       await this.postRepository.save(post);

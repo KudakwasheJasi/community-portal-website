@@ -24,7 +24,7 @@ export class UsersController {
   @Get()
   async findAll(): Promise<User[]> {
     const users = await this.usersService.findAll();
-    return users as User[];
+    return users;
   }
 
   @Get('profile')

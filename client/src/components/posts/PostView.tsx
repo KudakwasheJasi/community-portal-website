@@ -77,28 +77,32 @@ interface PostModalProps {
 }
 
 const PostModal: React.FC<PostModalProps> = ({ isOpen, onClose, onSave, postToEdit }) => {
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [status, setStatus] = useState<PostStatus>('To Do');
-  const [imageUrl, setImageUrl] = useState<string>('');
+   const [title, setTitle] = useState('');
+   const [description, setDescription] = useState('');
+   const [status, setStatus] = useState<PostStatus>('To Do');
+   const [imageUrl, setImageUrl] = useState<string>('');
 
-  useEffect(() => {
-    if (postToEdit) {
-      setTitle(postToEdit.title);
-      setDescription(postToEdit.description);
-      setStatus(postToEdit.status);
-      setImageUrl(postToEdit.imageUrl || '');
-    } else {
-      resetForm();
-    }
-  }, [postToEdit, isOpen]);
+   const resetForm = () => {
+     setTitle('');
+     setDescription('');
+     setStatus('To Do');
+     setImageUrl('');
+   };
 
-  const resetForm = () => {
-    setTitle('');
-    setDescription('');
-    setStatus('To Do');
-    setImageUrl('');
-  };
+   useEffect(() => {
+     if (postToEdit) {
+       // eslint-disable-next-line react-hooks/set-state-in-effect
+       setTitle(postToEdit.title);
+       // eslint-disable-next-line react-hooks/set-state-in-effect
+       setDescription(postToEdit.description);
+       // eslint-disable-next-line react-hooks/set-state-in-effect
+       setStatus(postToEdit.status);
+       // eslint-disable-next-line react-hooks/set-state-in-effect
+       setImageUrl(postToEdit.imageUrl || '');
+     } else {
+       resetForm();
+     }
+   }, [postToEdit, isOpen]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];

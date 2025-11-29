@@ -28,8 +28,10 @@ export const ColorModeProvider: React.FC<ColorModeProviderProps> = ({ children }
     if (typeof window !== 'undefined') {
       const savedMode = localStorage.getItem('colorMode') as PaletteMode;
       if (savedMode) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setMode(savedMode);
       } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setMode('dark');
       }
     }

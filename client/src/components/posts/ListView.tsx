@@ -116,7 +116,7 @@ const ListView: React.FC<ListViewProps> = ({ posts, onEdit, onDelete }) => {
                     <Chip
                       label={post.status.charAt(0).toUpperCase() + post.status.slice(1)}
                       size="small"
-                      color={getStatusColor(post.status) as any}
+                      color={getStatusColor(post.status)}
                       variant="outlined"
                       sx={{
                         textTransform: 'capitalize',

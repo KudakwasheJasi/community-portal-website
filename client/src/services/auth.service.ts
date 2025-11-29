@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { LoginCredentials, RegisterCredentials, AuthResponse } from '@/types/auth';
+import { LoginCredentials, RegisterCredentials, AuthResponse, User } from '@/types/auth';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api';
 const TOKEN_KEY = 'auth_token';
@@ -51,7 +51,7 @@ export const authService = {
     return response.data;
   },
 
-  getCurrentUser(): any {
+  getCurrentUser(): User | null {
     const user = localStorage.getItem('user');
     return user ? JSON.parse(user) : null;
   },

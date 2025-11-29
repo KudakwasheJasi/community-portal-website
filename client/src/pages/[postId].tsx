@@ -51,7 +51,9 @@ const EditPost: React.FC = () => {
       const numericPostId = parseInt(postId as string, 10);
       const post = getPostById(numericPostId);
       if (post) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setTitle(post.title);
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setDescription(post.description);
         // Authorization check: Redirect if the current user is not the creator
         if (post.creatorId !== currentUserId) {
@@ -59,6 +61,7 @@ const EditPost: React.FC = () => {
           return;
         }
       }
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setLoading(false);
     }
   }, [postId, router]);

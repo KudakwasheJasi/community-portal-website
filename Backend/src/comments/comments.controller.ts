@@ -8,12 +8,12 @@ import {
   Param,
   UseGuards,
   Request,
-  Query,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { CommentsService } from './comments.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
+import { User } from '../users/user.entity';
 
 @Controller('comments')
 @UseGuards(JwtAuthGuard)
@@ -41,19 +41,25 @@ export class CommentsController {
   }
 
   @Post()
-  async create(@Body() createCommentDto: CreateCommentDto, @Request() req) {
+  async create(
+    @Body() createCommentDto: CreateCommentDto,
+    @Request() req: { user: User },
+  ) {
     const authorId = req.user.id;
     return await this.commentsService.create({ ...createCommentDto, authorId });
   }
 
   @Put(':id')
-  async update(@Param('id') id: string, @Body() updateCommentDto: UpdateCommentDto, @Request() req) {
+  async update(
+    @Param('id') id: string,
+    @Body() updateCommentDto: UpdateCommentDto,
+  ) {
     // TODO: Add authorization check to ensure user can only update their own comments
     return await this.commentsService.update(id, updateCommentDto);
   }
 
   @Delete(':id')
-  async remove(@Param('id') id: string, @Request() req) {
+  async remove(@Param('id') id: string) {
     // TODO: Add authorization check to ensure user can only delete their own comments or admin can delete any
     return await this.commentsService.remove(id);
   }

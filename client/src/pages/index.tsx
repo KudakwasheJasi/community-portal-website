@@ -15,6 +15,7 @@ export default function Home() {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
     // Navigate to login page after 3 seconds
     const timer = setTimeout(() => {

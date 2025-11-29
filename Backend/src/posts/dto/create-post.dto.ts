@@ -1,5 +1,13 @@
 // backend/src/posts/dto/create-post.dto.ts
-import { IsString, IsOptional, IsEnum, IsArray, IsUUID, IsBoolean, IsUrl, IsNotEmpty } from 'class-validator';
+import {
+  IsString,
+  IsOptional,
+  IsEnum,
+  IsArray,
+  IsUUID,
+  IsUrl,
+  IsNotEmpty,
+} from 'class-validator';
 import { PostStatus, PostVisibility } from '../post.entity';
 
 export class CreatePostDto {

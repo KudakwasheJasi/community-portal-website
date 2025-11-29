@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/unbound-method */
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { JwtService } from '@nestjs/jwt';
@@ -79,6 +80,7 @@ describe('AuthService', () => {
       });
       expect(userRepository.create).toHaveBeenCalledWith({
         email: registerDto.email,
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         password: expect.any(String), // hashed password
         firstName: registerDto.firstName,
         lastName: registerDto.lastName,
@@ -108,9 +110,14 @@ describe('AuthService', () => {
         lastName: 'User',
       };
 
-      mockUserRepository.findOne.mockResolvedValue({ id: '1', email: registerDto.email });
+      mockUserRepository.findOne.mockResolvedValue({
+        id: '1',
+        email: registerDto.email,
+      });
 
-      await expect(service.register(registerDto)).rejects.toThrow('User with this email already exists');
+      await expect(service.register(registerDto)).rejects.toThrow(
+        'User with this email already exists',
+      );
     });
   });
 
@@ -167,7 +174,7 @@ describe('AuthService', () => {
       });
     });
 
-  it('should throw UnauthorizedException if user not found', async () => {
+    it('should throw UnauthorizedException if user not found', async () => {
       const loginDto: LoginDto = {
         email: 'nonexistent@example.com',
         password: 'password123',
@@ -175,7 +182,9 @@ describe('AuthService', () => {
 
       mockUserRepository.findOne.mockResolvedValue(null);
 
-      await expect(service.login(loginDto)).rejects.toThrow('Invalid credentials');
+      await expect(service.login(loginDto)).rejects.toThrow(
+        'Invalid credentials',
+      );
     });
 
     it('should throw UnauthorizedException for invalid password', async () => {
@@ -193,7 +202,9 @@ describe('AuthService', () => {
 
       mockUserRepository.findOne.mockResolvedValue(mockUser);
 
-      await expect(service.login(loginDto)).rejects.toThrow('Invalid credentials');
+      await expect(service.login(loginDto)).rejects.toThrow(
+        'Invalid credentials',
+      );
     });
   });
 
@@ -205,7 +216,9 @@ describe('AuthService', () => {
 
       const result = await service.validateUser('1');
 
-      expect(userRepository.findOne).toHaveBeenCalledWith({ where: { id: '1' } });
+      expect(userRepository.findOne).toHaveBeenCalledWith({
+        where: { id: '1' },
+      });
       expect(result).toEqual(mockUser);
     });
 
