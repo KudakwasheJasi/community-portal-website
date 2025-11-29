@@ -7,15 +7,10 @@ import {
   ManyToOne,
   JoinColumn,
   OneToMany,
-  ManyToMany,
-  JoinTable,
   Index,
 } from 'typeorm';
 import { User } from '../users/user.entity';
 import { Comment } from '../comments/comment.entity';
-import { Like } from '../likes/like.entity';
-import { Category } from '../categories/category.entity';
-import { Tag } from '../tags/tag.entity';
 
 export enum PostStatus {
   DRAFT = 'draft',
@@ -72,9 +67,6 @@ export class Post {
   viewCount: number;
 
   @Column({ default: 0 })
-  likeCount: number;
-
-  @Column({ default: 0 })
   commentCount: number;
 
   @Column('uuid')
@@ -91,25 +83,6 @@ export class Post {
   })
   comments: Comment[];
 
-  @OneToMany(() => Like, (like) => like.post)
-  likes: Like[];
-
-  @ManyToMany(() => Category, (category) => category.posts, { cascade: true })
-  @JoinTable({
-    name: 'post_categories',
-    joinColumn: { name: 'postId', referencedColumnName: 'id' },
-    inverseJoinColumn: { name: 'categoryId', referencedColumnName: 'id' },
-  })
-  categories: Category[];
-
-  @ManyToMany(() => Tag, (tag: Tag) => tag.posts, { cascade: true })
-  @JoinTable({
-    name: 'post_tags',
-    joinColumn: { name: 'postId', referencedColumnName: 'id' },
-    inverseJoinColumn: { name: 'tagId', referencedColumnName: 'id' },
-  })
-  tags: Tag[];
-
   @Column({ nullable: true })
   publishedAt: Date;
 
@@ -125,10 +98,6 @@ export class Post {
   // Helper methods
   incrementViewCount(): void {
     this.viewCount += 1;
-  }
-
-  updateLikeCount(): void {
-    this.likeCount = this.likes ? this.likes.length : 0;
   }
 
   updateCommentCount(): void {

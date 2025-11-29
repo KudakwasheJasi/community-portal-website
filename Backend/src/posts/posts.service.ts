@@ -1,100 +1,58 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Like as TypeOrmLike, FindManyOptions } from 'typeorm';
-import { Post, PostStatus, PostVisibility } from './post.entity';
-import { User } from '../users/user.entity';
+import { Post, PostStatus } from './post.entity';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { PostQueryDto } from './post-query.dto';
-import { File } from '../files/file.entity';
-import { join } from 'path';
-import { existsSync, mkdirSync } from 'fs';
-import { FileType } from '../files/file.entity';
 
 @Injectable()
 export class PostsService {
   constructor(
     @InjectRepository(Post)
     private postRepository: Repository<Post>,
-    @InjectRepository(File)
-    private fileRepository: Repository<File>,
   ) {}
-
-  private async saveUploadedFile(file: Express.Multer.File, userId: string): Promise<string> {
-    const uploadDir = join(__dirname, '..', 'uploads');
-    if (!existsSync(uploadDir)) {
-      mkdirSync(uploadDir, { recursive: true });
-    }
-
-    const { v4: uuidv4 } = await import('uuid');
-    const fileExtension = file.originalname.split('.').pop();
-    const fileName = `${uuidv4()}.${fileExtension}`;
-    const filePath = join(uploadDir, fileName);
-
-    // Save file to disk
-    const fs = require('fs');
-    fs.writeFileSync(filePath, file.buffer);
-
-    return fileName;
-  }
 
   async findAll(query: PostQueryDto) {
     try {
-      const { 
-        page = 1, 
-        limit = 10, 
-        search, 
-        status, 
+      const {
+        page = 1,
+        limit = 10,
+        search,
+        status,
         visibility,
         authorId,
-        categoryId,
-        tagId,
       } = query;
 
       const skip = (page - 1) * limit;
       const where: any = {};
 
-      if (status) where.status = status;
-      if (visibility) where.visibility = visibility;
+      if (status) {
+        where.status = status;
+      }
+      if (visibility) {
+        where.visibility = visibility;
+      }
       if (authorId) where.authorId = authorId;
-      
+
       if (search) {
         where.title = TypeOrmLike(`%${search}%`);
       }
 
       const options: FindManyOptions<Post> = {
         where,
-        relations: ['author', 'categories', 'tags'],
+        relations: ['author'],
         order: { createdAt: 'DESC' },
         skip,
         take: limit,
       };
 
-      // Initialize relations array if not exists
-      if (!options.relations) {
-        options.relations = [];
-      }
-      
-      if (categoryId) {
-        if (Array.isArray(options.relations)) {
-          options.relations.push('categories');
-        } else {
-          options.relations.categories = true;
-        }
-        where.categories = { id: categoryId };
-      }
-
-      if (tagId) {
-        if (Array.isArray(options.relations)) {
-          options.relations.push('tags');
-        } else {
-          options.relations.tags = true;
-        }
-        where.tags = { id: tagId };
-      }
-
       const [items, total] = await this.postRepository.findAndCount(options);
-      
+
       return {
         items,
         total,
@@ -129,25 +87,20 @@ export class PostsService {
     }
   }
 
-  async create(createPostDto: CreatePostDto & { authorId: string; file?: Express.Multer.File }): Promise<Post> {
+  async create(createPostDto: CreatePostDto & { authorId: string }): Promise<Post> {
     try {
-      const { authorId, file, ...postData } = createPostDto;
-      
+      const { authorId, ...postData } = createPostDto;
+
       const postDataWithAuthor = {
         ...postData,
         author: { id: authorId }
       };
-      
-      if (postData.status === PostStatus.PUBLISHED) {
+
+      if (postData.status && postData.status === PostStatus.PUBLISHED) {
         postDataWithAuthor['publishedAt'] = new Date();
       }
-      
-      const post = this.postRepository.create(postDataWithAuthor);
 
-      if (file) {
-        const fileName = await this.saveUploadedFile(file, authorId);
-        postDataWithAuthor.featuredImage = `/uploads/${fileName}`;
-      }
+      const post = this.postRepository.create(postDataWithAuthor);
 
       return await this.postRepository.save(post);
     } catch (error) {
@@ -155,19 +108,13 @@ export class PostsService {
     }
   }
 
-  async update(id: string, updatePostDto: UpdatePostDto & { file?: Express.Multer.File }): Promise<Post> {
+  async update(id: string, updatePostDto: UpdatePostDto): Promise<Post> {
     try {
-      const { file, ...updateData } = updatePostDto;
+      const updateData = updatePostDto;
       const post = await this.findOne(id);
 
       // Create a new object for the updated data with proper typing
       const updatedData: Partial<Post> = { ...updateData };
-
-      // Handle file upload if a new file is provided
-      if (file) {
-        const fileName = await this.saveUploadedFile(file, post.authorId);
-        updatedData.featuredImage = `/uploads/${fileName}`;
-      }
 
       // Update status timestamp if status changed to PUBLISHED
       if (updateData.status === PostStatus.PUBLISHED && post.status !== PostStatus.PUBLISHED) {

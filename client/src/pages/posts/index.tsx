@@ -1,8 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
+import {
+  Button,
+  ToggleButton,
+  ToggleButtonGroup,
+  Container,
+  Typography,
+  Box,
+  Alert,
+  CircularProgress
+} from '@mui/material';
+import { ViewList, GridView, Refresh } from '@mui/icons-material';
 import MainDashboardLayout from '@/components/dashboard/MainDashboardLayout';
 import CreateEditPostDialog from '@/components/posts/CreateEditPostDialog';
+import BoardView from '@/components/posts/BoardView';
+import ListView from '@/components/posts/ListView';
 import postsService, { Post } from '@/services/posts.service';
+
+type ViewMode = 'list' | 'board';
 
 interface PostFormData {
   id?: string;
@@ -14,6 +29,7 @@ interface PostFormData {
 
 const PostsPage: React.FC = () => {
   const [posts, setPosts] = useState<Post[]>([]);
+  const [viewMode, setViewMode] = useState<ViewMode>('board');
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingPostId, setEditingPostId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -98,55 +114,136 @@ const PostsPage: React.FC = () => {
     }
   };
 
+  const handleRefresh = () => {
+    setLoading(true);
+    // Simulate refresh
+    setTimeout(() => {
+      setLoading(false);
+    }, 1000);
+  };
+
   return (
     <MainDashboardLayout title="Posts Management">
-      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '24px' }}>
-        {error && <div style={{ color: 'red', marginBottom: '16px' }}>{error}</div>}
-        <div style={{ marginBottom: '24px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-            <h1>Posts</h1>
-            <button onClick={handleCreate} style={{ padding: '8px 16px', backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: '4px' }}>
-              Create Post
-            </button>
-          </div>
-        </div>
+      <Container maxWidth="xl" sx={{ py: 3 }}>
+        {error && (
+          <Alert severity="error" sx={{ mb: 3 }}>
+            {error}
+          </Alert>
+        )}
+        <Box sx={{ mb: 3 }}>
+          <Box sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            mb: 2
+          }}>
+            <Typography variant="h3" component="h1" sx={{
+              fontWeight: 700,
+              color: 'text.primary',
+              fontSize: '2.5rem'
+            }}>
+              Posts Management
+            </Typography>
+
+            <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'center' }}>
+              <ToggleButtonGroup
+                value={viewMode}
+                exclusive
+                onChange={(_, newValue) => newValue && setViewMode(newValue)}
+                size="medium"
+                sx={{
+                  '& .MuiToggleButtonGroup-grouped': {
+                    border: '1px solid',
+                    borderColor: 'divider',
+                    '&:not(:first-of-type)': {
+                      borderLeft: '1px solid',
+                      borderColor: 'divider',
+                      marginLeft: 0,
+                      borderTopLeftRadius: 0,
+                      borderBottomLeftRadius: 0,
+                    },
+                    '&:first-of-type': {
+                      borderTopRightRadius: 0,
+                      borderBottomRightRadius: 0,
+                    },
+                    '&.Mui-selected': {
+                      bgcolor: 'action.selected',
+                      color: 'primary.main',
+                      '&:hover': {
+                        bgcolor: 'action.hover',
+                      },
+                    },
+                  },
+                }}
+              >
+                <ToggleButton
+                  value="list"
+                >
+                  <ViewList sx={{ mr: 1 }} />
+                  List
+                </ToggleButton>
+                <ToggleButton
+                  value="board"
+                >
+                  <GridView sx={{ mr: 1 }} />
+                  Board
+                </ToggleButton>
+              </ToggleButtonGroup>
+
+              <Button
+                variant="outlined"
+                startIcon={<Refresh />}
+                onClick={handleRefresh}
+                size="medium"
+                sx={{
+                  borderRadius: 1,
+                  textTransform: 'none',
+                  color: 'text.secondary',
+                  borderColor: 'divider',
+                  fontSize: '1rem',
+                  py: 1.5,
+                  px: 3,
+                  '&:hover': {
+                    borderColor: 'text.secondary',
+                    bgcolor: 'action.hover'
+                  }
+                }}
+              >
+                Refresh
+              </Button>
+
+              <Button
+                variant="contained"
+                onClick={handleCreate}
+                size="medium"
+                sx={{
+                  borderRadius: 1,
+                  textTransform: 'none',
+                  fontWeight: 500,
+                  fontSize: '1rem',
+                  py: 1.5,
+                  px: 3,
+                  boxShadow: 'none',
+                  '&:hover': {
+                    boxShadow: 'none',
+                    bgcolor: 'primary.dark'
+                  }
+                }}
+              >
+                Create Post
+              </Button>
+            </Box>
+          </Box>
+        </Box>
 
         {loading ? (
-          <div style={{ display: 'flex', justifyContent: 'center', margin: '64px 0' }}>
-            <div>Loading...</div>
-          </div>
+          <Box sx={{ display: 'flex', justifyContent: 'center', my: 8 }}>
+            <CircularProgress />
+          </Box>
+        ) : viewMode === 'board' ? (
+          <BoardView posts={posts} onEdit={handleEdit} onDelete={handleDelete} />
         ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '16px' }}>
-            {posts.length > 0 ? (
-              posts.map((post) => (
-                <div key={post.id} style={{ border: '1px solid #ddd', borderRadius: '8px', overflow: 'hidden' }}>
-                  <Image
-                    src={post.imageUrl || 'https://picsum.photos/800/600'}
-                    alt={post.title}
-                    width={300}
-                    height={140}
-                    style={{ width: '100%', height: '140px', objectFit: 'cover' }}
-                  />
-                  <div style={{ padding: '16px' }}>
-                    <h2 style={{ margin: '0 0 8px 0' }}>{post.title}</h2>
-                    <p style={{ margin: '0 0 16px 0', color: '#666' }}>{post.description}</p>
-                    <div>
-                      <button onClick={() => handleEdit(post)} style={{ marginRight: '8px', padding: '4px 8px' }}>Edit</button>
-                      <button onClick={() => handleDelete(post.id)} style={{ padding: '4px 8px', backgroundColor: '#dc3545', color: 'white', border: 'none' }}>Delete</button>
-                    </div>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '64px', border: '2px dashed #ddd' }}>
-                <div style={{ fontSize: '48px', color: '#ccc', marginBottom: '16px' }}>📝</div>
-                <h2>No posts found</h2>
-                <button onClick={handleCreate} style={{ marginTop: '16px', padding: '8px 16px', backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: '4px' }}>
-                  Create Post
-                </button>
-              </div>
-            )}
-          </div>
+          <ListView posts={posts} onEdit={handleEdit} onDelete={handleDelete} />
         )}
 
         <CreateEditPostDialog
@@ -156,7 +253,7 @@ const PostsPage: React.FC = () => {
           initialData={activePostData}
           title={activePostData ? 'Edit Post' : 'Create New Post'}
         />
-      </div>
+      </Container>
     </MainDashboardLayout>
   );
 };

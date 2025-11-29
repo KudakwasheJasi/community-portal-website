@@ -1,12 +1,20 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany, JoinColumn, RelationId } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+  ManyToOne,
+  OneToMany,
+  JoinColumn,
+} from 'typeorm';
 import { User } from '../users/user.entity.ts';
 import { Post } from '../posts/post.entity.ts';
-import { Like } from '../likes/like.entity.ts';
 
 export enum CommentStatus {
   ACTIVE = 'active',
   DELETED = 'deleted',
-  FLAGGED = 'flagged'
+  FLAGGED = 'flagged',
 }
 
 @Entity('comments')
@@ -17,37 +25,36 @@ export class Comment {
   @Column('text')
   content: string;
 
-  @Column({ 
+  @Column({
     type: 'varchar',
     length: 20,
-    default: CommentStatus.ACTIVE
+    default: CommentStatus.ACTIVE,
   })
   status: CommentStatus;
 
   // Relations
-  @ManyToOne(() => User, user => user.comments, { onDelete: 'CASCADE' })
+  @ManyToOne(() => User, (user) => user.comments, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'authorId' })
   author: User;
 
   @Column('uuid')
   authorId: string;
 
-  @ManyToOne(() => Post, post => post.comments, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Post, (post) => post.comments, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'postId' })
   post: Post;
 
   @Column('uuid')
   postId: string;
 
-  @ManyToOne(() => Comment, comment => comment.replies, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Comment, (comment) => comment.replies, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'parentId' })
   parent: Comment;
 
-  @OneToMany(() => Comment, comment => comment.parent)
+  @OneToMany(() => Comment, (comment) => comment.parent)
   replies: Comment[];
-
-  @OneToMany(() => Like, like => like.comment)
-  likes: Like[];
 
   @Column({ default: 0 })
   likeCount: number;

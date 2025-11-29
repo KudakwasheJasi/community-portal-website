@@ -11,6 +11,7 @@ import { PostsModule } from './posts/posts.module';
 import { EventsModule } from './events/events.module';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
+import { CommentsModule } from './comments/comments.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { AuthModule } from './auth/auth.module';
     UsersModule,
     PostsModule,
     EventsModule,
+    CommentsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -8,16 +8,12 @@ import {
   Param,
   UseGuards,
   Request,
-  UseInterceptors,
-  UploadedFile,
   Query,
-  ParseIntPipe,
   BadRequestException,
   NotFoundException,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
 import { PostsService } from './posts.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { CreatePostDto } from './dto/create-post.dto';
@@ -38,7 +34,9 @@ export class PostsController {
     try {
       return await this.postsService.findAll(query);
     } catch (error) {
-      throw new BadRequestException(error.message);
+      throw new BadRequestException(
+        error instanceof Error ? error.message : 'Failed to fetch posts',
+      );
     }
   }
 
@@ -52,36 +50,35 @@ export class PostsController {
       return post;
     } catch (error) {
       if (error instanceof NotFoundException) throw error;
-      throw new BadRequestException('Invalid post ID');
+      throw new BadRequestException(
+        error instanceof Error ? error.message : 'Invalid post ID',
+      );
     }
   }
 
   @UseGuards(JwtAuthGuard)
   @Post()
-  @UseInterceptors(FileInterceptor('file'))
   async create(
     @Body() createPostDto: CreatePostDto,
-    @UploadedFile() file: Express.Multer.File,
     @Request() req: AuthenticatedRequest,
   ) {
     try {
       return await this.postsService.create({
         ...createPostDto,
         authorId: req.user.id,
-        file,
       });
     } catch (error) {
-      throw new BadRequestException(error.message);
+      throw new BadRequestException(
+        error instanceof Error ? error.message : 'Failed to create post',
+      );
     }
   }
 
   @UseGuards(JwtAuthGuard)
   @Put(':id')
-  @UseInterceptors(FileInterceptor('file'))
   async update(
     @Param('id') id: string,
     @Body() updatePostDto: UpdatePostDto,
-    @UploadedFile() file: Express.Multer.File,
     @Request() req: AuthenticatedRequest,
   ) {
     try {
@@ -94,12 +91,12 @@ export class PostsController {
         throw new BadRequestException('Not authorized to update this post');
       }
 
-      return await this.postsService.update(id, {
-        ...updatePostDto,
-        file,
-      });
+      return await this.postsService.update(id, updatePostDto);
     } catch (error) {
-      if (error instanceof NotFoundException || error instanceof BadRequestException) {
+      if (
+        error instanceof NotFoundException ||
+        error instanceof BadRequestException
+      ) {
         throw error;
       }
       throw new BadRequestException('Failed to update post');
@@ -122,7 +119,10 @@ export class PostsController {
       await this.postsService.remove(id);
       return { message: 'Post deleted successfully' };
     } catch (error) {
-      if (error instanceof NotFoundException || error instanceof BadRequestException) {
+      if (
+        error instanceof NotFoundException ||
+        error instanceof BadRequestException
+      ) {
         throw error;
       }
       throw new BadRequestException('Failed to delete post');

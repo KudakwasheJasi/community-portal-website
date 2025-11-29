@@ -4,16 +4,13 @@ import { MulterModule } from '@nestjs/platform-express';
 import { PostsService } from './posts.service.ts';
 import { PostsController } from './posts.controller.ts';
 import { Post } from './post.entity.ts';
-import { File } from '../files/file.entity.ts';
-import { FilesModule } from '../files/files.module.ts';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Post, File]),
+    TypeOrmModule.forFeature([Post]),
     MulterModule.register({
       dest: './uploads',
     }),
-    FilesModule,
   ],
   providers: [PostsService],
   controllers: [PostsController],

@@ -10,8 +10,6 @@ import { Post } from '../posts/post.entity.ts';
 import { Event } from '../events/event.entity.ts';
 import { EventRegistration } from '../events/event-registration.entity.ts';
 import { Comment } from '../comments/comment.entity.ts';
-import { Like } from '../likes/like.entity.ts';
-import { Notification } from '../notifications/notification.entity.ts';
 import * as bcrypt from 'bcryptjs';
 
 export enum UserRole {
@@ -68,12 +66,6 @@ export class User {
 
   @OneToMany(() => Comment, (comment) => comment.author)
   comments: Comment[];
-
-  @OneToMany(() => Like, (like) => like.user)
-  likes: Like[];
-
-  @OneToMany(() => Notification, (notification) => notification.recipient)
-  notifications: Notification[];
 
   @CreateDateColumn()
   createdAt: Date;

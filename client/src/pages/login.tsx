@@ -204,7 +204,7 @@ const Login: React.FC = () => {
          </Button>
         <Box sx={{ textAlign: 'center', mt: 3 }}>
           <Typography variant="body2" color="text.secondary">
-            Don't have an account?{' '}
+            Don&apos;t have an account?{' '}
             <Link component={NextLink} href="/register" color="primary">
               Sign Up
             </Link>
