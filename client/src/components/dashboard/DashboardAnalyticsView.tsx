@@ -166,11 +166,11 @@ const PostCard: React.FC<{ data: Post }> = ({ data }) => {
         <Stack direction="row" justifyContent="space-between" alignItems="flex-start" mb={1.5}>
           <Stack direction="row" spacing={1.5} alignItems="center">
             <Avatar sx={{ width: 40, height: 40, bgcolor: 'primary.main' }}>
-              {data.author ? data.author.charAt(0).toUpperCase() : 'U'}
+              {data.author?.username ? data.author.username.charAt(0).toUpperCase() : 'U'}
             </Avatar>
             <Box>
               <Typography variant="subtitle2" fontWeight={600}>
-                {data.author}
+                {data.author?.username || 'Unknown Author'}
               </Typography>
               <Typography variant="caption" color="text.secondary">
                 {new Date(data.date).toLocaleDateString()}
