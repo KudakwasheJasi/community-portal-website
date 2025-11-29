@@ -6,6 +6,7 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import * as bcrypt from 'bcryptjs';
 import { User } from '../users/user.entity';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
@@ -18,8 +19,10 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async register(registerDto: RegisterDto): Promise<{ access_token: string }> {
-    const { email, password, firstName, lastName } = registerDto;
+  async register(
+    registerDto: RegisterDto,
+  ): Promise<{ access_token: string; user: any }> {
+    const { email, password, firstName, lastName, phoneNumber } = registerDto;
 
     // Check if user already exists
     const existingUser = await this.userRepository.findOne({
@@ -29,24 +32,37 @@ export class AuthService {
       throw new ConflictException('User with this email already exists');
     }
 
-    // Create user (password will be hashed by the entity hook)
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Create user
     const user = this.userRepository.create({
       email,
-      password,
+      password: hashedPassword,
       firstName,
       lastName,
+      phoneNumber,
     });
 
     await this.userRepository.save(user);
 
     // Generate JWT token
     const payload = { email: user.email, sub: user.id };
+    const userWithoutPassword = {
+      ...user,
+      password: undefined,
+      name: user.fullName,
+      mobileNumber: user.phoneNumber,
+    };
     return {
       access_token: this.jwtService.sign(payload),
+      user: userWithoutPassword,
     };
   }
 
-  async login(loginDto: LoginDto): Promise<{ access_token: string }> {
+  async login(
+    loginDto: LoginDto,
+  ): Promise<{ access_token: string; user: any }> {
     const { email, password } = loginDto;
 
     // Find user by email (explicitly select password field)
@@ -75,8 +91,15 @@ export class AuthService {
 
     // Generate JWT token
     const payload = { email: user.email, sub: user.id };
+    const userWithoutPassword = {
+      ...user,
+      password: undefined,
+      name: user.fullName,
+      mobileNumber: user.phoneNumber,
+    };
     return {
       access_token: this.jwtService.sign(payload),
+      user: userWithoutPassword,
     };
   }
 

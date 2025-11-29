@@ -19,7 +19,7 @@ import { AuthModule } from './auth/auth.module.js';
       load: [configuration],
       envFilePath: `.env.${process.env.NODE_ENV || 'development'}`,
     }),
-    
+
     // Database - PostgreSQL Configuration
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
@@ -33,9 +33,10 @@ import { AuthModule } from './auth/auth.module.js';
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
         synchronize: configService.get('DB_SYNCHRONIZE', true),
         logging: configService.get('DB_LOGGING', true),
-        ssl: configService.get('NODE_ENV') === 'production' 
-          ? { rejectUnauthorized: false } 
-          : false,
+        ssl:
+          configService.get('NODE_ENV') === 'production'
+            ? { rejectUnauthorized: false }
+            : false,
       }),
       inject: [ConfigService],
     }),

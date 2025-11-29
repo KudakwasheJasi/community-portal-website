@@ -17,4 +17,7 @@ export class RegisterDto {
   @IsString()
   @IsNotEmpty()
   lastName: string;
+
+  @IsString()
+  phoneNumber?: string;
 }

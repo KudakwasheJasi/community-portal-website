@@ -61,8 +61,8 @@ export const authService = {
   },
 
   setAuthData(data: AuthResponse): void {
-    if (data.token) {
-      setToken(data.token);
+    if (data.access_token) {
+      setToken(data.access_token);
     }
   },
 

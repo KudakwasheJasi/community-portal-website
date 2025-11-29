@@ -1,4 +1,11 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, OneToMany, BeforeInsert, BeforeUpdate } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+  OneToMany,
+} from 'typeorm';
 import { Post } from '../posts/post.entity.js';
 import { Event } from '../events/event.entity.js';
 import { EventRegistration } from '../events/event-registration.entity.js';
@@ -10,7 +17,7 @@ import * as bcrypt from 'bcryptjs';
 export enum UserRole {
   USER = 'user',
   MODERATOR = 'moderator',
-  ADMIN = 'admin'
+  ADMIN = 'admin',
 }
 
 @Entity('users')
@@ -31,12 +38,15 @@ export class User {
   lastName: string;
 
   @Column({ nullable: true })
+  phoneNumber?: string;
+
+  @Column({ nullable: true })
   avatar?: string;
 
   @Column({
     type: 'varchar',
     length: 20,
-    default: UserRole.USER
+    default: UserRole.USER,
   })
   role: UserRole;
 
@@ -47,22 +57,22 @@ export class User {
   isActive: boolean;
 
   // Relations
-  @OneToMany(() => Post, post => post.author)
+  @OneToMany(() => Post, (post) => post.author)
   posts: Post[];
 
-  @OneToMany(() => Event, event => event.organizer)
+  @OneToMany(() => Event, (event) => event.organizer)
   organizedEvents: Event[];
 
-  @OneToMany(() => EventRegistration, registration => registration.user)
+  @OneToMany(() => EventRegistration, (registration) => registration.user)
   eventRegistrations: EventRegistration[];
 
-  @OneToMany(() => Comment, comment => comment.author)
+  @OneToMany(() => Comment, (comment) => comment.author)
   comments: Comment[];
 
-  @OneToMany(() => Like, like => like.user)
+  @OneToMany(() => Like, (like) => like.user)
   likes: Like[];
 
-  @OneToMany(() => Notification, notification => notification.recipient)
+  @OneToMany(() => Notification, (notification) => notification.recipient)
   notifications: Notification[];
 
   @CreateDateColumn()
@@ -71,14 +81,7 @@ export class User {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  // Hooks
-  @BeforeInsert()
-  @BeforeUpdate()
-  async hashPassword() {
-    if (this.password) {
-      this.password = await bcrypt.hash(this.password, 10);
-    }
-  }
+  // Password hashing is handled in the auth service
 
   async validatePassword(password: string): Promise<boolean> {
     return bcrypt.compare(password, this.password);
