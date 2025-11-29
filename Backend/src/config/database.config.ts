@@ -1,14 +1,28 @@
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
 
-export const databaseConfig = (configService: ConfigService): TypeOrmModuleOptions => ({
-  type: 'postgres',
-  host: configService.get('DB_HOST', 'localhost'),
-  port: configService.get('DB_PORT', 5432),
-  username: configService.get('DB_USERNAME', 'postgres'),
-  password: configService.get('DB_PASSWORD', 'password'),
-  database: configService.get('DB_DATABASE', 'community_portal'),
-  entities: [__dirname + '/../**/*.entity{.ts,.js}'],
-  synchronize: configService.get('NODE_ENV') !== 'production',
-  logging: configService.get('NODE_ENV') === 'development',
-});
+export const databaseConfig = (
+  configService: ConfigService,
+): TypeOrmModuleOptions => {
+  const isProduction = configService.get('NODE_ENV') === 'production';
+
+  if (isProduction) {
+    return {
+      type: 'postgres',
+      url: configService.get('DATABASE_URL'),
+      entities: [__dirname + '/../**/*.entity{.ts,.js}'],
+      synchronize: false, // Should be false in production
+      ssl: {
+        rejectUnauthorized: false, // For production, you might want to configure this properly
+      },
+    };
+  } else {
+    return {
+      type: 'better-sqlite3',
+      database: configService.get('DB_DATABASE', './database.sqlite'),
+      entities: [__dirname + '/../**/*.entity{.ts,.js}'],
+      synchronize: true, // Only for development
+      logging: true, // Only for development
+    };
+  }
+};

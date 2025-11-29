@@ -1,7 +1,6 @@
-# Use Node.js 18 Alpine as base image
-FROM node:18-alpine
+# Build stage
+FROM node:18-alpine AS builder
 
-# Set working directory
 WORKDIR /app
 
 # Copy package files
@@ -19,8 +18,26 @@ RUN mkdir -p uploads
 # Build the application
 RUN npm run build
 
-# Expose port
+# Production stage
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+
+# Install only production dependencies
+RUN npm ci --omit=dev
+
+# Copy built files from builder
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/uploads ./uploads
+
+# Create uploads directory in case it doesn't exist
+RUN mkdir -p uploads
+
+# Expose the port the app runs on
 EXPOSE 3000
 
 # Start the application
-CMD ["npm", "run", "start:prod"]
+CMD ["node", "dist/main.js"]

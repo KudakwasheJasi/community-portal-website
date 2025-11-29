@@ -1,9 +1,13 @@
-import { Injectable, NotFoundException, BadRequestException, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+  Logger,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, In } from 'typeorm';
-import { Event } from './event.entity.js';
-import { EventRegistration } from './event-registration.entity.js';
-import { User } from '../users/user.entity.js';
+import { Repository } from 'typeorm';
+import { Event } from './event.entity.ts';
+import { EventRegistration } from './event-registration.entity.ts';
 
 @Injectable()
 @Injectable()
@@ -63,7 +67,10 @@ export class EventsService {
     await this.eventRepository.remove(event);
   }
 
-  async registerForEvent(eventId: string, userId: string): Promise<EventRegistration> {
+  async registerForEvent(
+    eventId: string,
+    userId: string,
+  ): Promise<EventRegistration> {
     const event = await this.findOne(eventId);
 
     // Check if event is full
@@ -77,7 +84,9 @@ export class EventsService {
     });
 
     if (existingRegistration) {
-      throw new BadRequestException('User is already registered for this event');
+      throw new BadRequestException(
+        'User is already registered for this event',
+      );
     }
 
     const registration = this.registrationRepository.create({

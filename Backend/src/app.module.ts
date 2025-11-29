@@ -1,40 +1,46 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { ThrottlerModule } from '@nestjs/throttler';
-import { CacheModule } from '@nestjs/cache-manager';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { AuthModule } from './auth/auth.module';
-import { UsersModule } from './users/users.module';
+import configuration from './config/configuration';
+import { databaseConfig } from './config/database.config';
 import { PostsModule } from './posts/posts.module';
 import { EventsModule } from './events/events.module';
-import { databaseConfig } from './config/database.config';
+import { UsersModule } from './users/users.module';
+import { AuthModule } from './auth/auth.module';
+import { CommentsModule } from './comments/comments.module';
 
 @Module({
   imports: [
+    // Core modules
     ConfigModule.forRoot({
       isGlobal: true,
+      load: [configuration],
+      envFilePath: `.env.${process.env.NODE_ENV || 'development'}`,
     }),
+
+    // Database Configuration
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: databaseConfig,
       inject: [ConfigService],
     }),
-    ThrottlerModule.forRoot([
-      {
-        ttl: 60000,
-        limit: 10,
-      },
-    ]),
-    CacheModule.register({
-      isGlobal: true,
-      ttl: 300000, // 5 minutes
+
+    // Static files
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'uploads'),
+      serveRoot: '/uploads',
     }),
+
+    // Feature modules
     AuthModule,
     UsersModule,
     PostsModule,
     EventsModule,
+    CommentsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
