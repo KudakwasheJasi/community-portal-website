@@ -9,7 +9,6 @@ import {
   Link,
   Paper,
   Container,
-  Grid,
   Alert,
 } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
@@ -161,8 +160,8 @@ const Register: React.FC = () => {
       </Head>
       <GradientBackground>
         <Container maxWidth="lg" sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <Grid container spacing={25} justifyContent="center" alignItems="center">
-            <Grid item md={6} sx={{ display: { xs: 'none', md: 'block' } }}>
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '2rem', width: '100%' }}>
+            <div style={{ flex: 1, maxWidth: '500px', display: 'none' }}>
               <LeftPanel>
                 <Typography variant="h6" gutterBottom sx={{ fontWeight: 500 }}>
                   Join our community today!
@@ -172,8 +171,8 @@ const Register: React.FC = () => {
                 </Typography>
                 <Sphere />
               </LeftPanel>
-            </Grid>
-            <Grid item xs={12} md={6}>
+            </div>
+            <div style={{ flex: 1, maxWidth: '500px' }}>
               <RightPanel elevation={3}>
                 <Typography variant="h4" component="h2" fontWeight="bold" color="primary" gutterBottom>
                   Create Account
@@ -327,8 +326,8 @@ const Register: React.FC = () => {
                   </Box>
                 </Box>
               </RightPanel>
-            </Grid>
-          </Grid>
+            </div>
+          </div>
         </Container>
       </GradientBackground>
     </>

@@ -6,12 +6,12 @@ import {
   UpdateDateColumn,
   OneToMany,
 } from 'typeorm';
-import { Post } from '../posts/post.entity.js';
-import { Event } from '../events/event.entity.js';
-import { EventRegistration } from '../events/event-registration.entity.js';
-import { Comment } from '../comments/comment.entity.js';
-import { Like } from '../likes/like.entity.js';
-import { Notification } from '../notifications/notification.entity.js';
+import { Post } from '../posts/post.entity.ts';
+import { Event } from '../events/event.entity.ts';
+import { EventRegistration } from '../events/event-registration.entity.ts';
+import { Comment } from '../comments/comment.entity.ts';
+import { Like } from '../likes/like.entity.ts';
+import { Notification } from '../notifications/notification.entity.ts';
 import * as bcrypt from 'bcryptjs';
 
 export enum UserRole {

@@ -1,6 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn, OneToMany, Index } from 'typeorm';
-import { User } from '../users/user.entity.js';
-import { EventRegistration } from './event-registration.entity.js';
+import { User } from '../users/user.entity.ts';
+import { EventRegistration } from './event-registration.entity.ts';
 
 @Entity('events')
 export class Event {

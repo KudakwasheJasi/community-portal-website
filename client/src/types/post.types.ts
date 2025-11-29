@@ -49,6 +49,7 @@ export interface Post {
   categories?: Category[];
   tags?: Tag[];
   // Legacy fields for backward compatibility
+  description?: string;
   imageUrl?: string;
   date?: string;
   authorName?: string;

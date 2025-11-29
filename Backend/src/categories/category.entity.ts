@@ -1,5 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, ManyToMany, Tree, TreeChildren, TreeParent, TreeLevelColumn } from 'typeorm';
-import { Post } from '../posts/post.entity.js';
+import { Post } from '../posts/post.entity.ts';
 
 @Entity('categories')
 @Tree('materialized-path')

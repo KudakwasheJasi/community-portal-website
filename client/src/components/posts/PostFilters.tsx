@@ -23,7 +23,7 @@ import {
   FilterList as FilterListIcon,
   Close as CloseIcon
 } from '@mui/icons-material';
-import { Post, PostStatus } from '@/types/post';
+import { Post, PostStatus } from '@/types/post.types';
 
 interface PostFiltersProps {
   searchQuery: string;
@@ -40,9 +40,9 @@ interface PostFiltersProps {
 }
 
 const statusOptions = [
-  { value: 'published', label: 'Published' },
-  { value: 'draft', label: 'Draft' },
-  { value: 'archived', label: 'Archived' }
+  { value: PostStatus.PUBLISHED, label: 'Published' },
+  { value: PostStatus.DRAFT, label: 'Draft' },
+  { value: PostStatus.ARCHIVED, label: 'Archived' }
 ] as const;
 
 const PostFilters: React.FC<PostFiltersProps> = ({
@@ -198,8 +198,8 @@ const PostFilters: React.FC<PostFiltersProps> = ({
                 onDelete={() => handleRemoveStatus(status)}
                 size="small"
                 color={
-                  status === 'published' ? 'success' :
-                  status === 'draft' ? 'warning' : 'default'
+                  status === PostStatus.PUBLISHED ? 'success' :
+                  status === PostStatus.DRAFT ? 'warning' : 'default'
                 }
                 deleteIcon={<CloseIcon />}
               />

@@ -8,9 +8,9 @@ import {
   UseGuards,
   Request,
 } from '@nestjs/common';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
-import { UsersService } from './users.service.js';
-import { User } from './user.entity.js';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard.ts';
+import { UsersService } from './users.service.ts';
+import { User } from './user.entity.ts';
 import { Request as ExpressRequest } from 'express';
 interface AuthenticatedRequest extends ExpressRequest {
   user: { id: string };

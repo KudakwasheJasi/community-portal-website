@@ -3,7 +3,7 @@ import { Box, AppBar, Toolbar, IconButton, Typography, useTheme, useMediaQuery, 
 import MenuIcon from '@mui/icons-material/Menu';
 import SearchIcon from '@mui/icons-material/Search';
 import NotificationsIcon from '@mui/icons-material/Notifications';
-import MainNavigationSidebar from './MainNavigationSidebar';
+import MainNavigationSidebar from '../MainNavigationSidebar';
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',

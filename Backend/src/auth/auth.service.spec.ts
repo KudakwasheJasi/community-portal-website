@@ -79,16 +79,25 @@ describe('AuthService', () => {
       });
       expect(userRepository.create).toHaveBeenCalledWith({
         email: registerDto.email,
-        password: registerDto.password,
+        password: expect.any(String), // hashed password
         firstName: registerDto.firstName,
         lastName: registerDto.lastName,
+        phoneNumber: undefined,
       });
       expect(userRepository.save).toHaveBeenCalledWith(mockUser);
       expect(jwtService.sign).toHaveBeenCalledWith({
         email: mockUser.email,
         sub: mockUser.id,
       });
-      expect(result).toEqual({ access_token: 'jwt-token' });
+      expect(result).toEqual({
+        access_token: 'jwt-token',
+        user: {
+          ...mockUser,
+          password: undefined,
+          name: undefined,
+          mobileNumber: undefined,
+        },
+      });
     });
 
     it('should throw ConflictException if user already exists', async () => {
@@ -147,10 +156,18 @@ describe('AuthService', () => {
         email: mockUser.email,
         sub: mockUser.id,
       });
-      expect(result).toEqual({ access_token: 'jwt-token' });
+      expect(result).toEqual({
+        access_token: 'jwt-token',
+        user: {
+          ...mockUser,
+          password: undefined,
+          name: undefined,
+          mobileNumber: undefined,
+        },
+      });
     });
 
-    it('should throw UnauthorizedException if user not found', async () => {
+  it('should throw UnauthorizedException if user not found', async () => {
       const loginDto: LoginDto = {
         email: 'nonexistent@example.com',
         password: 'password123',

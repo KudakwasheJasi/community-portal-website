@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { MulterModule } from '@nestjs/platform-express';
-import { PostsService } from './posts.service.js';
-import { PostsController } from './posts.controller.js';
-import { Post } from './post.entity.js';
-import { File } from '../files/file.entity.js';
-import { FilesModule } from '../files/files.module.js';
+import { PostsService } from './posts.service.ts';
+import { PostsController } from './posts.controller.ts';
+import { Post } from './post.entity.ts';
+import { File } from '../files/file.entity.ts';
+import { FilesModule } from '../files/files.module.ts';
 
 @Module({
   imports: [

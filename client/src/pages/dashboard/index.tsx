@@ -4,7 +4,7 @@
 import React from 'react';
 import dynamic from 'next/dynamic';
 import { Box, CircularProgress } from '@mui/material';
-import MainDashboardLayout from '@/components/MainDashboardLayout';
+import MainDashboardLayout from '@/components/dashboard/MainDashboardLayout';
 
 // Use dynamic import for better performance
 const DashboardAnalyticsView = dynamic(

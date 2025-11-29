@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, Typography, Grid, Card, CardContent, Avatar, Button } from '@mui/material';
 import { People as PeopleIcon, GroupAdd as GroupAddIcon } from '@mui/icons-material';
-import MainDashboardLayout from '@/components/MainDashboardLayout';
+import MainDashboardLayout from '@/components/dashboard/MainDashboardLayout';
 
 const Community: React.FC = () => {
   // Mock community data - in a real app, this would come from an API

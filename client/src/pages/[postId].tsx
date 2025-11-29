@@ -9,7 +9,7 @@ import {
 } from '@mui/material';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import MainDashboardLayout from '@/components/MainDashboardLayout';
+import MainDashboardLayout from '@/components/dashboard/MainDashboardLayout';
 import { PhotoCamera } from '@mui/icons-material';
 
 // --- Mock Data Fetching ---

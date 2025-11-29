@@ -15,15 +15,15 @@ import {
   Tooltip,
   Avatar,
   useTheme,
-  TablePagination
+  TablePagination,
 } from '@mui/material';
 import {
   Edit as EditIcon,
   Delete as DeleteIcon,
   Visibility as VisibilityIcon,
-  Share as ShareIcon
+  Share as ShareIcon,
 } from '@mui/icons-material';
-import { Post } from '@/types/post';
+import { Post, PostStatus } from '@/types/post.types';
 
 interface PostListProps {
   posts: Post[];
@@ -38,7 +38,7 @@ interface PostListProps {
   rowsPerPage?: number;
   onPageChange?: (page: number) => void;
   onRowsPerPageChange?: (rowsPerPage: number) => void;
-  totalCount?: number;
+  totalCount?: number; // Add totalCount to props
 }
 
 const PostList: React.FC<PostListProps> = ({
@@ -54,7 +54,7 @@ const PostList: React.FC<PostListProps> = ({
   rowsPerPage = 10,
   onPageChange,
   onRowsPerPageChange,
-  totalCount = 0
+  totalCount = 0,
 }) => {
   const theme = useTheme();
 
@@ -71,15 +71,33 @@ const PostList: React.FC<PostListProps> = ({
   };
 
   const renderLoadingRows = () => {
-    return Array(5).fill(0).map((_, index) => (
-      <TableRow key={index}>
-        <TableCell><Skeleton variant="text" /></TableCell>
-        <TableCell><Skeleton variant="text" /></TableCell>
-        <TableCell><Skeleton variant="text" /></TableCell>
-        <TableCell><Skeleton variant="text" /></TableCell>
-        <TableCell><Skeleton variant="text" width={100} /></TableCell>
-        <TableCell><Skeleton variant="text" width={100} /></TableCell>
-      </TableRow>
+    return Array(rowsPerPage)
+      .fill(0)
+      .map((_, index) => (
+        <TableRow key={index}>
+          <TableCell>
+            <Skeleton variant="text" />
+          </TableCell>
+          <TableCell>
+            <Skeleton variant="text" />
+          </TableCell>
+          <TableCell>
+            <Skeleton variant="text" width="80%" />
+          </TableCell>
+          <TableCell>
+            <Skeleton variant="text" width="60%" />
+          </TableCell>
+          <TableCell>
+            <Skeleton variant="text" width={100} />
+          </TableCell>
+          <TableCell>
+            <Skeleton variant="text" width={100} />
+          </TableCell>
+          <TableCell>
+            <Skeleton variant="circular" width={24} height={24} sx={{ mr: 1 }} />
+            <Skeleton variant="text" width={80} />
+          </TableCell>
+        </TableRow>
     ));
   };
 
@@ -91,8 +109,8 @@ const PostList: React.FC<PostListProps> = ({
             <TableRow>
               <TableCell>
                 <TableSortLabel
-                  active={sortBy === 'title'}
-                  direction={sortBy === 'title' ? sortDirection : 'asc'}
+                  active={sortBy === 'title'} // Assuming 'title' is a sortable field
+                  direction={sortBy === 'title' ? sortDirection : 'asc'} // Default to 'asc' if not sorted by 'title'
                   onClick={() => handleSort('title')}
                 >
                   Title
@@ -103,8 +121,8 @@ const PostList: React.FC<PostListProps> = ({
               <TableCell>Tags</TableCell>
               <TableCell>
                 <TableSortLabel
-                  active={sortBy === 'status'}
-                  direction={sortBy === 'status' ? sortDirection : 'asc'}
+                  active={sortBy === 'status'} // Assuming 'status' is a sortable field
+                  direction={sortBy === 'status' ? sortDirection : 'asc'} // Default to 'asc' if not sorted by 'status'
                   onClick={() => handleSort('status')}
                 >
                   Status
@@ -112,8 +130,8 @@ const PostList: React.FC<PostListProps> = ({
               </TableCell>
               <TableCell>
                 <TableSortLabel
-                  active={sortBy === 'date'}
-                  direction={sortBy === 'date' ? sortDirection : 'desc'}
+                  active={sortBy === 'date'} // Assuming 'date' is a sortable field
+                  direction={sortBy === 'date' ? sortDirection : 'desc'} // Default to 'desc' if not sorted by 'date'
                   onClick={() => handleSort('date')}
                 >
                   Date
@@ -129,9 +147,9 @@ const PostList: React.FC<PostListProps> = ({
               posts.map((post) => (
                 <TableRow key={post.id} hover>
                   <TableCell>
-                    <Box display="flex" alignItems="center">
-                      <Avatar 
-                        src={post.imageUrl} 
+                    <Box display="flex" alignItems="center" maxWidth={200}>
+                      <Avatar
+                        src={post.imageUrl}
                         alt={post.title}
                         variant="rounded"
                         sx={{ width: 40, height: 40, mr: 2 }}
@@ -146,7 +164,7 @@ const PostList: React.FC<PostListProps> = ({
                         WebkitLineClamp: 2,
                         WebkitBoxOrient: 'vertical',
                         overflow: 'hidden',
-                        textOverflow: 'ellipsis',
+                        textOverflow: 'ellipsis', // Ensure ellipsis for overflow
                         maxWidth: 300
                       }}
                     >
@@ -155,18 +173,18 @@ const PostList: React.FC<PostListProps> = ({
                   </TableCell>
                   <TableCell>
                     <Box display="flex" alignItems="center">
-                      <Avatar sx={{ width: 24, height: 24, mr: 1 }}>
-                        {post.author?.[0]?.toUpperCase()}
+                      <Avatar sx={{ width: 24, height: 24, mr: 1, bgcolor: theme.palette.primary.main }}>
+                        {post.author?.username?.[0]?.toUpperCase()}
                       </Avatar>
-                      {post.author}
+                      {post.author?.username}
                     </Box>
                   </TableCell>
                   <TableCell>
                     <Box display="flex" flexWrap="wrap" gap={0.5} maxWidth={150}>
-                      {post.tags?.slice(0, 2).map((tag) => (
-                        <Chip 
-                          key={tag} 
-                          label={tag} 
+                      {post.tags?.slice(0, 2).map((tag, index) => (
+                        <Chip
+                          key={index}
+                          label={tag.name}
                           size="small"
                           variant="outlined"
                         />
@@ -180,31 +198,31 @@ const PostList: React.FC<PostListProps> = ({
                     </Box>
                   </TableCell>
                   <TableCell>
-                    <Chip 
-                      label={post.status} 
+                    <Chip
+                      label={post.status}
                       size="small"
                       color={
-                        post.status === 'published' ? 'success' : 
-                        post.status === 'draft' ? 'warning' : 'default'
+                        post.status === PostStatus.PUBLISHED ? 'success' :
+                        post.status === PostStatus.DRAFT ? 'warning' : 'default'
                       }
                     />
                   </TableCell>
                   <TableCell>
-                    {new Date(post.date).toLocaleDateString()}
+ {post.date ? new Date(post.date).toLocaleDateString() : 'No date'}
                   </TableCell>
                   <TableCell>
                     <Box display="flex" gap={1}>
-                      <Tooltip title="View">
+                      <Tooltip title="View Post">
                         <IconButton size="small" onClick={() => onView?.(post.id)}>
                           <VisibilityIcon fontSize="small" />
                         </IconButton>
                       </Tooltip>
-                      <Tooltip title="Edit">
+                      <Tooltip title="Edit Post">
                         <IconButton size="small" onClick={() => onEdit?.(post)}>
                           <EditIcon fontSize="small" />
                         </IconButton>
                       </Tooltip>
-                      <Tooltip title="Delete">
+                      <Tooltip title="Delete Post">
                         <IconButton size="small" onClick={() => onDelete?.(post.id)}>
                           <DeleteIcon fontSize="small" />
                         </IconButton>
@@ -228,7 +246,7 @@ const PostList: React.FC<PostListProps> = ({
         count={totalCount}
         rowsPerPage={rowsPerPage}
         page={page}
-        onPageChange={(e, newPage) => handleChangePage(e, newPage)}
+        onPageChange={handleChangePage}
         onRowsPerPageChange={handleChangeRowsPerPage}
       />
     </Paper>

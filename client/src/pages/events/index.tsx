@@ -17,7 +17,7 @@ import {
 } from '@mui/material';
 import EventBusyIcon from '@mui/icons-material/EventBusy';
 import CheckIcon from '@mui/icons-material/Check';
-import MainDashboardLayout from '@/components/MainDashboardLayout';
+import MainDashboardLayout from '@/components/dashboard/MainDashboardLayout';
 import eventsService, { Event } from '@/services/events.service';
 
 // --- TYPES ---
@@ -410,54 +410,5 @@ const EventList: React.FC<EventListProps> = ({ events, onRegister }) => {
 // --- COMPONENTS ---
 
 // --- THEME ---
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: '#2b8cee',
-    },
-    background: {
-      default: '#f6f7f8',
-      paper: '#ffffff',
-    },
-    text: {
-      primary: '#111418',
-      secondary: '#637588',
-    },
-  },
-  typography: {
-    fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
-    h6: {
-      fontWeight: 700,
-    },
-    button: {
-      textTransform: 'none',
-      fontWeight: 600,
-    },
-  },
-  shape: {
-    borderRadius: 12,
-  },
-  components: {
-    MuiButton: {
-      styleOverrides: {
-        root: {
-          borderRadius: 20,
-          boxShadow: 'none',
-          '&:hover': {
-            boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-          },
-        },
-      },
-    },
-    MuiCard: {
-      styleOverrides: {
-        root: {
-          boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
-          border: '1px solid rgba(0,0,0,0.05)',
-        },
-      },
-    },
-  },
-});
 
 export default EventsPage;

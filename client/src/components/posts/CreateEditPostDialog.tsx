@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Image from 'next/image';
 import {
   Dialog,
   DialogTitle,
@@ -25,7 +26,7 @@ interface PostFormData {
 interface CreateEditPostDialogProps {
   open: boolean;
   onClose: () => void;
-  onSubmit: (data: PostFormData) => void;
+  onSubmit: (data: PostFormData) => Promise<void>;
   initialData?: PostFormData;
   title: string;
 }
@@ -89,9 +90,9 @@ const CreateEditPostDialog: React.FC<CreateEditPostDialogProps> = ({
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit({ ...formData, file: selectedFile || undefined });
+    await onSubmit({ ...formData, file: selectedFile || undefined });
   };
 
   return (
@@ -159,9 +160,11 @@ const CreateEditPostDialog: React.FC<CreateEditPostDialogProps> = ({
               )}
               {imagePreview && (
                 <Box sx={{ mt: 2 }}>
-                  <img
+                  <Image
                     src={imagePreview}
                     alt="Preview"
+                    width={400}
+                    height={200}
                     style={{ maxWidth: '100%', maxHeight: '200px', objectFit: 'cover' }}
                   />
                 </Box>

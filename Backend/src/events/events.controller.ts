@@ -15,10 +15,10 @@ import {
   HttpStatus,
   Logger
 } from '@nestjs/common';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
-import { EventsService } from './events.service.js';
-import { Event } from './event.entity.js';
-import { EventRegistration } from './event-registration.entity.js';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard.ts';
+import { EventsService } from './events.service.ts';
+import { Event } from './event.entity.ts';
+import { EventRegistration } from './event-registration.entity.ts';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 
 @ApiTags('events')

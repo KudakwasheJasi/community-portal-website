@@ -1,6 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, ManyToOne, JoinColumn, Unique, Index } from 'typeorm';
-import { User } from '../users/user.entity.js';
-import { Event } from './event.entity.js';
+import { User } from '../users/user.entity.ts';
+import { Event } from './event.entity.ts';
 
 @Entity('event_registrations')
 @Index(['userId', 'eventId'])

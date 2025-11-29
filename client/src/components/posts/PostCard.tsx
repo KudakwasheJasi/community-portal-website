@@ -6,7 +6,6 @@ import {
   CardContent,
   Typography,
   CardActions,
-  Button,
   Chip,
   Box,
   IconButton,
@@ -21,7 +20,7 @@ import {
   Visibility as VisibilityIcon,
   Share as ShareIcon
 } from '@mui/icons-material';
-import { Post } from '@/types/post';
+import { Post } from '../../services/posts.service';
 
 interface PostCardProps {
   post: Post;
@@ -81,7 +80,7 @@ const PostCard: React.FC<PostCardProps> = ({
               }
             />
             <Typography variant="caption" color="text.secondary">
-              {new Date(post.date).toLocaleDateString()}
+              {post.date ? new Date(post.date).toLocaleDateString() : 'No date'}
             </Typography>
           </Box>
           <Typography gutterBottom variant="h6" component="h3" noWrap>
@@ -101,11 +100,11 @@ const PostCard: React.FC<PostCardProps> = ({
             {post.description}
           </Typography>
           <Box mt={2} display="flex" flexWrap="wrap" gap={0.5}>
-            {post.tags?.map((tag) => (
-              <Chip 
-                key={tag} 
-                label={tag} 
-                size="small" 
+            {post.tags?.map((tag, index) => (
+              <Chip
+                key={index}
+                label={tag}
+                size="small"
                 variant="outlined"
               />
             ))}
@@ -115,10 +114,10 @@ const PostCard: React.FC<PostCardProps> = ({
       <CardActions sx={{ justifyContent: 'space-between', p: 2 }}>
         <Box display="flex" alignItems="center">
           <Avatar sx={{ width: 24, height: 24, mr: 1 }}>
-            {post.author?.[0]?.toUpperCase()}
+            {post.author?.username?.[0]?.toUpperCase() || 'U'}
           </Avatar>
           <Typography variant="caption" color="text.secondary">
-            {post.author}
+            {post.author?.username || 'Unknown'}
           </Typography>
         </Box>
         <Box>

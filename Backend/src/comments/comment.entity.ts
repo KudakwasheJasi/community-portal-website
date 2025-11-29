@@ -1,7 +1,7 @@
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany, JoinColumn, RelationId } from 'typeorm';
-import { User } from '../users/user.entity.js';
-import { Post } from '../posts/post.entity.js';
-import { Like } from '../likes/like.entity.js';
+import { User } from '../users/user.entity.ts';
+import { Post } from '../posts/post.entity.ts';
+import { Like } from '../likes/like.entity.ts';
 
 export enum CommentStatus {
   ACTIVE = 'active',

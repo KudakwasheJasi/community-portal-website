@@ -1,9 +1,9 @@
 import { Injectable, NotFoundException, BadRequestException, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In } from 'typeorm';
-import { Event } from './event.entity.js';
-import { EventRegistration } from './event-registration.entity.js';
-import { User } from '../users/user.entity.js';
+import { Event } from './event.entity.ts';
+import { EventRegistration } from './event-registration.entity.ts';
+import { User } from '../users/user.entity.ts';
 
 @Injectable()
 @Injectable()
