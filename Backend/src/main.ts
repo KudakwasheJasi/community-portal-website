@@ -13,10 +13,28 @@ async function bootstrap() {
     configService.get<string>('FRONTEND_URL') || 'http://localhost:3000';
 
   // Enable CORS
+  const allowedOrigins = [
+    'http://localhost:3000',
+    'http://localhost:3001',
+    'https://community-portal-website.onrender.com',
+    'https://client-r02b6gz9x-kudakwashejasis-projects.vercel.app'
+  ];
+  
   app.enableCors({
-    origin: ['http://localhost:3000', 'http://localhost:3001'],
+    origin: function (origin, callback) {
+      // Allow requests with no origin (like mobile apps or curl requests)
+      if (!origin) return callback(null, true);
+      
+      if (allowedOrigins.indexOf(origin) === -1) {
+        const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+        return callback(new Error(msg), false);
+      }
+      return callback(null, true);
+    },
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
+    allowedHeaders: 'Content-Type,Authorization',
+    exposedHeaders: 'Content-Range,X-Content-Range'
   });
 
   // Set global prefix before Swagger setup
@@ -46,11 +64,16 @@ async function bootstrap() {
 
   await app.listen(port);
 
-  console.log(
-    `🚀 Application is running on: http://localhost:${port} in ${nodeEnv} mode`,
-  );
+  console.log(`🚀 Application is running on port: ${port} in ${nodeEnv} mode`);
   console.log(`🌐 Frontend URL: ${frontendUrl}`);
   console.log(`📚 API Documentation: http://localhost:${port}/api`);
+  
+  // Log all environment variables (for debugging, remove in production)
+  console.log('Environment Variables:', {
+    NODE_ENV: configService.get('NODE_ENV'),
+    PORT: configService.get('PORT'),
+    FRONTEND_URL: configService.get('FRONTEND_URL')
+  });
 }
 
 bootstrap().catch((err) => {
