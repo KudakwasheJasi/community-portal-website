@@ -23,8 +23,8 @@ FROM node:18-alpine
 
 WORKDIR /app
 
-# Copy package files
-COPY --from=builder package*.json ./
+# Copy package files from builder
+COPY --from=builder /app/package*.json ./
 
 # Install only production dependencies
 RUN npm install --omit=dev
