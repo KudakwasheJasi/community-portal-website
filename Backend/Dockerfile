@@ -24,7 +24,7 @@ FROM node:18-alpine
 WORKDIR /app
 
 # Copy package files
-COPY package*.json ./
+COPY --from=builder package*.json ./
 
 # Install only production dependencies
 RUN npm ci --omit=dev
