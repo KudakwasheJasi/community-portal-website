@@ -7,10 +7,16 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
-  const port = configService.get<number>('PORT') || 3000;
+  const port = configService.get<number>('PORT') || 3001;
   const nodeEnv = configService.get<string>('NODE_ENV') || 'development';
   const frontendUrl =
     configService.get<string>('FRONTEND_URL') || 'http://localhost:3000';
+
+  // Configure payload size limits for file uploads
+  const expressApp = app.getHttpAdapter().getInstance();
+  expressApp.set('trust proxy', 1);
+  expressApp.use(require('body-parser').json({ limit: '10mb' }));
+  expressApp.use(require('body-parser').urlencoded({ limit: '10mb', extended: true }));
 
   // Enable CORS
   const allowedOrigins = [

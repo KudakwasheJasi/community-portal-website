@@ -19,8 +19,8 @@ const EventCard: React.FC<EventCardProps> = ({ data }) => {
   const date = startDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
   const time = startDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
 
-  // Generate a default image URL based on event title
-  const imageUrl = `https://via.placeholder.com/400x200?text=${encodeURIComponent(data.title)}`;
+  // Use event's imageUrl if available, otherwise generate a default image URL
+  const imageUrl = data.imageUrl || `https://picsum.photos/400/200?random=${encodeURIComponent(data.title)}`;
 
   return (
     <Card

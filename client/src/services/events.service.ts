@@ -38,6 +38,7 @@ export interface Event {
     registeredAt: string;
   }[];
   status?: 'open' | 'registered' | 'closed';
+  imageUrl?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -48,14 +49,20 @@ export interface EventRegistration {
   userId: string;
   registeredAt: string;
   event?: Event;
+  user?: {
+    id: string;
+    name: string;
+    email: string;
+  };
 }
 
 export interface CreateEventData {
   title: string;
-  date: string;
-  time: string;
+  startDate: string;
+  endDate: string;
   location?: string;
   description?: string;
+  maxAttendees?: number;
   imageUrl?: string;
 }
 

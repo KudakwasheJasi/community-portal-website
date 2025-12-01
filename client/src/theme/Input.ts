@@ -13,22 +13,33 @@ const Input = (theme: Theme): Components<Theme> => ({
         borderWidth: 2,
         marginBottom: 25,
         color: theme.palette.text.primary,
+        backgroundColor: 'transparent !important',
+        '& .MuiOutlinedInput-notchedOutline': {
+          borderColor: theme.palette.mode === 'light' ? 'rgba(0, 0, 0, 0.23)' : 'rgba(255, 255, 255, 0.23)',
+        },
+        '&:hover .MuiOutlinedInput-notchedOutline': {
+          borderColor: theme.palette.text.primary,
+        },
+        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+          borderColor: theme.palette.primary.main,
+          borderWidth: 2,
+        },
         transition: theme.transitions.create(["border-color", "box-shadow"], {
           duration: theme.transitions.duration.short,
         }),
         "&:-webkit-autofill": {
-          WebkitBoxShadow: `0 0 0 1000px #ffffff inset !important`,
+          WebkitBoxShadow: `0 0 0 1000px transparent inset !important`,
           WebkitTextFillColor: `${theme.palette.text.primary} !important`,
-          caretColor: "inherit",
+          caretColor: theme.palette.text.primary,
           borderRadius: "inherit",
-          backgroundClip: "content-box !important",
+          transition: 'background-color 5000s ease-in-out 0s',
         },
         "&:-webkit-autofill:focus": {
-          WebkitBoxShadow: `0 0 0 1000px #ffffff inset !important`,
+          WebkitBoxShadow: `0 0 0 1000px transparent inset !important`,
           WebkitTextFillColor: `${theme.palette.text.primary} !important`,
         },
         "&:-webkit-autofill:hover": {
-          WebkitBoxShadow: `0 0 0 1000px #ffffff inset !important`,
+          WebkitBoxShadow: `0 0 0 1000px transparent inset !important`,
           WebkitTextFillColor: `${theme.palette.text.primary} !important`,
         },
         "& input": {
@@ -44,17 +55,22 @@ const Input = (theme: Theme): Components<Theme> => ({
           },
 
           "&:-webkit-autofill": {
-            boxShadow: `0 0 0 1000px #ffffff inset !important`,
+            boxShadow: `0 0 0 1000px transparent inset !important`,
             WebkitTextFillColor: `${theme.palette.text.primary} !important`,
-            caretColor: "inherit",
+            caretColor: theme.palette.text.primary,
             borderRadius: "inherit",
+            transition: 'background-color 5000s ease-in-out 0s',
             backgroundClip: "content-box !important",
           },
           "&:-webkit-autofill:focus": {
-            boxShadow: `0 0 0 1000px #ffffff inset !important`,
+            boxShadow: '0 0 0 1000px transparent inset !important',
+            WebkitTextFillColor: `${theme.palette.text.primary} !important`,
+            backgroundColor: 'transparent !important',
           },
           "&:-webkit-autofill:hover": {
-            boxShadow: `0 0 0 1000px #ffffff inset !important`,
+            boxShadow: '0 0 0 1000px transparent inset !important',
+            WebkitTextFillColor: `${theme.palette.text.primary} !important`,
+            backgroundColor: 'transparent !important',
           },
         },
 
@@ -67,8 +83,11 @@ const Input = (theme: Theme): Components<Theme> => ({
           borderWidth: "2px",
         },
         "&.Mui-focused": {
-          backgroundColor: "none",
-          borderColor: theme.palette.primary.main,
+          backgroundColor: 'transparent !important',
+          '& .MuiOutlinedInput-notchedOutline': {
+            borderColor: `${theme.palette.primary.main} !important`,
+            borderWidth: '2px !important',
+          },
         },
 
         "& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button":

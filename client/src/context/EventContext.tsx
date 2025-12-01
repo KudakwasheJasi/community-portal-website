@@ -5,9 +5,10 @@ interface EventContextType {
   events: Event[];
   loading: boolean;
   error: string | null;
+  loadingStates: Record<string, 'registering' | 'unregistering' | null>;
   fetchEvents: () => Promise<void>;
-  registerForEvent: (id: string) => Promise<void>;
-  unregisterFromEvent: (id: string) => Promise<void>;
+  registerForEvent: (id: string) => Promise<{ success: boolean; message?: string }>;
+  unregisterFromEvent: (id: string) => Promise<{ success: boolean; message?: string }>;
   clearError: () => void;
 }
 
@@ -17,6 +18,7 @@ export const EventProvider = ({ children }: { children: ReactNode }) => {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [loadingStates, setLoadingStates] = useState<Record<string, 'registering' | 'unregistering' | null>>({});
 
   const fetchEvents = async () => {
     try {
@@ -63,29 +65,75 @@ export const EventProvider = ({ children }: { children: ReactNode }) => {
 
   const registerForEvent = async (id: string) => {
     try {
-      setError(null);
+      setLoadingStates(prev => ({ ...prev, [id]: 'registering' }));
+      
+      // Optimistic update
+      setEvents(prevEvents =>
+        prevEvents.map(event =>
+          event.id === id
+            ? { ...event, status: 'registered' as const }
+            : event
+        )
+      );
+
       await eventsService.registerForEvent(id);
-      setEvents(prev => prev.map(event =>
-        event.id === id ? { ...event, status: 'registered' } : event
-      ));
-    } catch (err: unknown) {
+      
+      // Final update with fresh data
+      await fetchEvents();
+      
+      return { success: true };
+    } catch (err) {
+      // Revert optimistic update on error
+      setEvents(prevEvents =>
+        prevEvents.map(event =>
+          event.id === id
+            ? { ...event, status: 'open' as const }
+            : event
+        )
+      );
+      
       const errorMessage = err instanceof Error ? err.message : 'Failed to register for event';
       setError(errorMessage);
-      throw new Error(errorMessage);
+      return { success: false, message: errorMessage };
+    } finally {
+      setLoadingStates(prev => ({ ...prev, [id]: null }));
     }
   };
 
   const unregisterFromEvent = async (id: string) => {
     try {
-      setError(null);
+      setLoadingStates(prev => ({ ...prev, [id]: 'unregistering' }));
+      
+      // Optimistic update
+      setEvents(prevEvents =>
+        prevEvents.map(event =>
+          event.id === id
+            ? { ...event, status: 'open' as const }
+            : event
+        )
+      );
+
       await eventsService.unregisterFromEvent(id);
-      setEvents(prev => prev.map(event =>
-        event.id === id ? { ...event, status: 'open' } : event
-      ));
-    } catch (err: unknown) {
+      
+      // Final update with fresh data
+      await fetchEvents();
+      
+      return { success: true };
+    } catch (err) {
+      // Revert optimistic update on error
+      setEvents(prevEvents =>
+        prevEvents.map(event =>
+          event.id === id
+            ? { ...event, status: 'registered' as const }
+            : event
+        )
+      );
+      
       const errorMessage = err instanceof Error ? err.message : 'Failed to unregister from event';
       setError(errorMessage);
-      throw new Error(errorMessage);
+      return { success: false, message: errorMessage };
+    } finally {
+      setLoadingStates(prev => ({ ...prev, [id]: null }));
     }
   };
 
@@ -99,13 +147,29 @@ export const EventProvider = ({ children }: { children: ReactNode }) => {
     events,
     loading,
     error,
+    loadingStates,
     fetchEvents,
     registerForEvent,
     unregisterFromEvent,
     clearError,
   };
 
-  return <EventContext.Provider value={value}>{children}</EventContext.Provider>;
+  return (
+    <EventContext.Provider
+      value={{
+        events,
+        loading,
+        error,
+        loadingStates,
+        fetchEvents,
+        registerForEvent,
+        unregisterFromEvent,
+        clearError,
+      }}
+    >
+      {children}
+    </EventContext.Provider>
+  );
 };
 
 export const useEvents = (): EventContextType => {

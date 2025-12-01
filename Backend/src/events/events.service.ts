@@ -25,10 +25,18 @@ export class EventsService {
 
   async findAll(): Promise<Event[]> {
     try {
-      return await this.eventRepository.find({
+      const events = await this.eventRepository.find({
         relations: ['organizer', 'registrations'],
         order: { createdAt: 'DESC' },
       });
+
+      // Return sample events if database is empty
+      if (events.length === 0) {
+        console.log('No events found in database, returning sample events');
+        return this.getSampleEvents();
+      }
+
+      return events;
     } catch {
       // Return sample events when database is not available
       console.warn('Database not available, returning sample events');
@@ -52,7 +60,7 @@ export class EventsService {
         endDate: new Date(futureDate.getTime() + 2 * 60 * 60 * 1000), // 2 hours later
         maxAttendees: 50,
         status: EventStatus.PUBLISHED,
-        imageUrl: 'https://via.placeholder.com/400x200?text=Tech+Meetup',
+        imageUrl: 'https://picsum.photos/400/200?random=tech-meetup',
         organizerId: 'sample-user-1',
         organizer: {
           id: 'sample-user-1',
@@ -81,7 +89,7 @@ export class EventsService {
         ), // 3 hours later
         maxAttendees: 25,
         status: EventStatus.PUBLISHED,
-        imageUrl: 'https://via.placeholder.com/400x200?text=Workshop',
+        imageUrl: 'https://picsum.photos/400/200?random=workshop',
         organizerId: 'sample-user-2',
         organizer: {
           id: 'sample-user-2',
@@ -110,7 +118,7 @@ export class EventsService {
         ), // 4 hours later
         maxAttendees: 100,
         status: EventStatus.PUBLISHED,
-        imageUrl: 'https://via.placeholder.com/400x200?text=Networking',
+        imageUrl: 'https://picsum.photos/400/200?random=networking',
         organizerId: 'sample-user-1',
         organizer: {
           id: 'sample-user-1',

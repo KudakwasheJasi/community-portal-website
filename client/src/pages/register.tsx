@@ -82,7 +82,7 @@ export default function RegisterPage() {
         p: 2,
       }}
     >
-      <Paper elevation={3} sx={{ p: 4, maxWidth: 500, width: '100%', borderRadius: '16px' }}>
+      <Paper elevation={3} sx={{ p: 3, maxWidth: 600, width: '100%', borderRadius: '12px' }}>
         <Typography variant="h4" component="h1" fontWeight="bold" color="primary" gutterBottom align="center">
           Create Account
         </Typography>
@@ -96,104 +96,110 @@ export default function RegisterPage() {
           </Alert>
         )}
 
-        <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }}>
+        <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2, '& .MuiTextField-root': { mb: 1.5 } }}>
           <TextField
-            margin="normal"
-            required
             fullWidth
+            required
             id="name"
             label="Full Name"
-              name="name"
-              value={form.name}
-              onChange={handleChange}
+            name="name"
+            value={form.name}
+            onChange={handleChange}
             error={!!errors.name}
             helperText={errors.name}
+            size="small"
           />
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            id="email"
-            label="Email Address"
+          <Box sx={{ display: 'flex', gap: 2 }}>
+            <TextField
+              fullWidth
+              required
+              id="email"
+              label="Email Address"
               name="email"
               type="email"
               value={form.email}
               onChange={handleChange}
-            error={!!errors.email}
-            helperText={errors.email}
-          />
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            id="mobile"
-            label="Mobile Number"
+              error={!!errors.email}
+              helperText={errors.email}
+              size="small"
+            />
+            <TextField
+              fullWidth
+              required
+              id="mobile"
+              label="Mobile Number"
               name="mobile"
               type="tel"
               value={form.mobile}
               onChange={handleChange}
-            error={!!errors.mobile}
-            helperText={errors.mobile}
-          />
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            id="password"
-            label="Password"
-            name="password"
-            type={showPassword ? 'text' : 'password'}
-            value={form.password}
-            onChange={handleChange}
-            error={!!errors.password}
-            helperText={errors.password}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton
-                    aria-label="toggle password visibility"
-                    onClick={togglePasswordVisibility}
-                    edge="end"
-                  >
-                    {showPassword ? <VisibilityOff /> : <Visibility />}
-                  </IconButton>
-                </InputAdornment>
-              ),
-            }}
-          />
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            id="confirmPassword"
-            label="Confirm Password"
-            name="confirmPassword"
-            type={showConfirmPassword ? 'text' : 'password'}
-            value={form.confirmPassword}
-            onChange={handleChange}
-            error={!!errors.confirmPassword}
-            helperText={errors.confirmPassword}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton
-                    aria-label="toggle confirm password visibility"
-                    onClick={toggleConfirmPasswordVisibility}
-                    edge="end"
-                  >
-                    {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
-                  </IconButton>
-                </InputAdornment>
-              ),
-            }}
-          />
+              error={!!errors.mobile}
+              helperText={errors.mobile}
+              size="small"
+            />
+          </Box>
+          <Box sx={{ display: 'flex', gap: 2 }}>
+            <TextField
+              fullWidth
+              required
+              id="password"
+              label="Password"
+              name="password"
+              type={showPassword ? 'text' : 'password'}
+              value={form.password}
+              onChange={handleChange}
+              error={!!errors.password}
+              helperText={errors.password}
+              size="small"
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label="toggle password visibility"
+                      onClick={togglePasswordVisibility}
+                      edge="end"
+                      size="small"
+                    >
+                      {showPassword ? <VisibilityOff fontSize="small" /> : <Visibility fontSize="small" />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+            />
+            <TextField
+              fullWidth
+              required
+              id="confirmPassword"
+              label="Confirm Password"
+              name="confirmPassword"
+              type={showConfirmPassword ? 'text' : 'password'}
+              value={form.confirmPassword}
+              onChange={handleChange}
+              error={!!errors.confirmPassword}
+              helperText={errors.confirmPassword}
+              size="small"
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label="toggle confirm password visibility"
+                      onClick={toggleConfirmPasswordVisibility}
+                      edge="end"
+                      size="small"
+                    >
+                      {showConfirmPassword ? <VisibilityOff fontSize="small" /> : <Visibility fontSize="small" />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </Box>
           <Button
             type="submit"
             fullWidth
             variant="contained"
-            size="large"
+            size="medium"
             disabled={loading}
-            sx={{ mt: 3, mb: 2, py: 1.5, borderRadius: '8px' }}
+            sx={{ mt: 2, mb: 1, py: 1, borderRadius: '6px' }}
           >
             {loading ? 'Registering...' : 'Register'}
           </Button>
