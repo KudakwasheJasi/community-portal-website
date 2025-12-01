@@ -24,6 +24,7 @@ export const databaseConfig = (
       synchronize: true, // Only for development
       logging: true, // Only for development
       connectTimeoutMS: 60000, // 60 second timeout
+      ssl: false, // Disable SSL for local development
     };
   }
 };
