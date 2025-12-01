@@ -9,6 +9,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { User } from '../users/user.entity';
+import { EventRegistration } from './event-registration.entity';
 
 export enum EventStatus {
   DRAFT = 'draft',
@@ -57,10 +58,14 @@ export class Event {
   @JoinColumn({ name: 'organizerId' })
   organizer: User;
 
-  @OneToMany('EventRegistration', (registration: any) => registration.event, {
-    cascade: true,
-    onDelete: 'CASCADE',
-  })
+  @OneToMany(
+    'EventRegistration',
+    (registration: EventRegistration) => registration.event,
+    {
+      cascade: true,
+      onDelete: 'CASCADE',
+    },
+  )
   registrations: any[];
 
   @CreateDateColumn()

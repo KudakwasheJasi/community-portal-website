@@ -119,7 +119,9 @@ export class EventsController {
     } catch (error) {
       if (error instanceof BadRequestException) throw error;
       throw new BadRequestException(
-        error instanceof Error ? error.message : 'Failed to unregister from event',
+        error instanceof Error
+          ? error.message
+          : 'Failed to unregister from event',
       );
     }
   }
@@ -131,7 +133,9 @@ export class EventsController {
       return await this.eventsService.getEventRegistrations(eventId);
     } catch (error) {
       throw new BadRequestException(
-        error instanceof Error ? error.message : 'Failed to fetch event registrations',
+        error instanceof Error
+          ? error.message
+          : 'Failed to fetch event registrations',
       );
     }
   }
@@ -143,7 +147,9 @@ export class EventsController {
       return await this.eventsService.getUserRegistrations(req.user.id);
     } catch (error) {
       throw new BadRequestException(
-        error instanceof Error ? error.message : 'Failed to fetch user registrations',
+        error instanceof Error
+          ? error.message
+          : 'Failed to fetch user registrations',
       );
     }
   }

@@ -32,9 +32,11 @@ export class PostQueryDto {
 
   @IsOptional()
   @IsEnum(PostVisibility, { each: true })
-  @Transform(({ value }) => {
+  @Transform(({ value }): PostVisibility[] | undefined => {
     if (!value) return undefined;
-    return Array.isArray(value) ? value : [value];
+    return Array.isArray(value)
+      ? (value as PostVisibility[])
+      : [value as PostVisibility];
   })
   visibility?: PostVisibility[];
 
@@ -58,7 +60,9 @@ export class PostQueryDto {
 
   @IsOptional()
   @IsString()
-  @Transform(({ value }) => ((value as string)?.toUpperCase() === 'ASC' ? 'ASC' : 'DESC'))
+  @Transform(({ value }) =>
+    (value as string)?.toUpperCase() === 'ASC' ? 'ASC' : 'DESC',
+  )
   order?: 'ASC' | 'DESC' = 'DESC';
 
   // Include relations
@@ -82,4 +86,3 @@ export class PostQueryDto {
   @Transform(({ value }) => value === 'true')
   includeLikes?: boolean = false;
 }
-
