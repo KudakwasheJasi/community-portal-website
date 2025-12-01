@@ -64,9 +64,13 @@ async function bootstrap() {
 
   await app.listen(port);
 
+  const apiUrl = nodeEnv === 'production'
+    ? `https://community-portal-website.onrender.com/api`
+    : `http://localhost:${port}/api`;
+
   console.log(`🚀 Application is running on port: ${port} in ${nodeEnv} mode`);
   console.log(`🌐 Frontend URL: ${frontendUrl}`);
-  console.log(`📚 API Documentation: http://localhost:${port}/api`);
+  console.log(`📚 API Documentation: ${apiUrl}`);
   
   // Log all environment variables (for debugging, remove in production)
   console.log('Environment Variables:', {
