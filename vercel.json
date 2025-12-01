@@ -2,5 +2,8 @@
   "buildCommand": "cd client && npm run build",
   "outputDirectory": "client/.next",
   "installCommand": "npm install",
-  "framework": "nextjs"
+  "framework": "nextjs",
+  "env": {
+    "NEXT_PUBLIC_API_URL": "https://community-portal-website.onrender.com/api"
+  }
 }
