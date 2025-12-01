@@ -18,27 +18,9 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-export interface Post {
-  id: string;
-  title: string;
-  content: string;
-  featuredImage?: string;
-  status: 'published' | 'draft' | 'archived';
-  viewCount: number;
-  author: {
-    id: string;
-    username: string;
-    email: string;
-  };
-  createdAt: string;
-  updatedAt: string;
-  // Legacy fields for backward compatibility
-  description?: string;
-  imageUrl?: string;
-  date?: string;
-  views?: number;
-  tags?: string[];
-}
+import { Post as PostType, PostStatus, PostVisibility } from '@/types/post.types';
+
+export type Post = PostType;
 
 export interface CreatePostData {
   title: string;
@@ -59,10 +41,51 @@ export interface PostQueryParams {
   status?: string;
 }
 
+export interface PaginatedPostsResponse {
+  items: Post[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
 export const postsService = {
   async getAll(params?: PostQueryParams): Promise<Post[]> {
     const response = await api.get('/posts', { params });
-    return response.data;
+    const data = response.data as PaginatedPostsResponse;
+    const posts = data.items || [];
+
+    // Transform API response to match Post type
+    return posts.map((post: any) => ({
+      id: post.id,
+      title: post.title,
+      slug: post.slug || post.title.toLowerCase().replace(/\s+/g, '-'),
+      content: post.content,
+      excerpt: post.excerpt || post.description,
+      featuredImage: post.featuredImage || post.imageUrl,
+      images: post.images || [],
+      status: post.status,
+      visibility: post.visibility || PostVisibility.PUBLIC,
+      viewCount: post.viewCount || post.views || 0,
+      likeCount: post.likeCount || 0,
+      commentCount: post.commentCount || 0,
+      publishedAt: post.publishedAt,
+      createdAt: post.createdAt || post.date,
+      updatedAt: post.updatedAt,
+      author: post.author,
+      categories: post.categories || [],
+      tags: post.tags || [],
+      // Legacy fields
+      description: post.description,
+      imageUrl: post.imageUrl,
+      date: post.date,
+      authorName: post.authorName,
+    }));
+  },
+
+  async getAllPaginated(params?: PostQueryParams): Promise<PaginatedPostsResponse> {
+    const response = await api.get('/posts', { params });
+    return response.data as PaginatedPostsResponse;
   },
 
   async getById(id: string): Promise<Post> {

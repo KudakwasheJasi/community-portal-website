@@ -1,54 +1,81 @@
 import {
   Entity,
-  Column,
   PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  OneToMany,
+  JoinColumn,
   CreateDateColumn,
   UpdateDateColumn,
-  ManyToOne,
-  JoinColumn,
-  OneToMany,
 } from 'typeorm';
-import { User } from '../users/user.entity.ts';
-import { EventRegistration } from './event-registration.entity.ts';
+import { User } from '../users/user.entity';
+
+export enum EventStatus {
+  DRAFT = 'draft',
+  PUBLISHED = 'published',
+  CANCELLED = 'cancelled',
+  COMPLETED = 'completed',
+}
 
 @Entity('events')
 export class Event {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column()
+  @Column({ length: 255 })
   title: string;
 
-  @Column('text')
+  @Column({ type: 'text', nullable: true })
   description: string;
 
-  @Column()
+  @Column({ length: 255, nullable: true })
   location: string;
 
-  @Column()
+  @Column({ type: 'timestamp' })
   startDate: Date;
 
-  @Column()
+  @Column({ type: 'timestamp' })
   endDate: Date;
 
-  @Column('int')
+  @Column({ type: 'int', default: 0 })
   maxAttendees: number;
 
-  @Column('uuid')
+  @Column({
+    type: 'enum',
+    enum: EventStatus,
+    default: EventStatus.DRAFT,
+  })
+  status: EventStatus;
+
+  @Column({ nullable: true })
+  imageUrl: string;
+
+  @Column({ type: 'uuid' })
   organizerId: string;
 
-  @ManyToOne(() => User, (user) => user.organizedEvents, {
-    onDelete: 'CASCADE',
-  })
+  @ManyToOne(() => User, { eager: true })
   @JoinColumn({ name: 'organizerId' })
   organizer: User;
 
-  @OneToMany(() => EventRegistration, (registration) => registration.event)
-  registrations: EventRegistration[];
+  @OneToMany('EventRegistration', (registration: any) => registration.event, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
+  registrations: any[];
 
   @CreateDateColumn()
   createdAt: Date;
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  // Virtual property to get current attendee count
+  get currentAttendees(): number {
+    return this.registrations?.length || 0;
+  }
+
+  // Virtual property to check if event is full
+  get isFull(): boolean {
+    return this.maxAttendees > 0 && this.currentAttendees >= this.maxAttendees;
+  }
 }

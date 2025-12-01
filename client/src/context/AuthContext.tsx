@@ -61,7 +61,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         mobileNumber,
       });
       handleAuthResponse(data);
-      router.push('/dashboard');
+      router.push('/login');
     } catch (error) {
       console.error('Registration failed:', error);
       throw error;

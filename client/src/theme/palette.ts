@@ -5,12 +5,14 @@ declare module '@mui/material/styles' {
     gradient: {
       primary: string;
       secondary: string;
+      background: string;
     };
   }
   interface PaletteOptions {
     gradient: {
       primary: string;
       secondary: string;
+      background: string;
     };
   }
 }
@@ -20,52 +22,56 @@ export const getDesignTokens = (mode: PaletteMode) => ({
     mode,
     ...(mode === 'light'
       ? {
-          // Light mode
+          // Light mode - Modern Community Portal Theme
           primary: {
-            main: '#3f51b5',
-            light: '#6573c3',
-            dark: '#2c387e',
+            main: '#6366f1', // Indigo-500
+            light: '#818cf8', // Indigo-400
+            dark: '#4f46e5', // Indigo-600
             contrastText: '#ffffff',
           },
           secondary: {
-            main: '#f50057',
-            light: '#f73378',
-            dark: '#ab003c',
+            main: '#ec4899', // Pink-500
+            light: '#f472b6', // Pink-400
+            dark: '#db2777', // Pink-600
             contrastText: '#ffffff',
           },
           background: {
-            default: '#f5f7fa',
+            default: '#fafbfc', // Very light gray
             paper: '#ffffff',
+            alt: '#f8fafc', // Slightly different shade for variety
           },
           text: {
-            primary: 'rgba(0, 0, 0, 0.87)',
-            secondary: 'rgba(0, 0, 0, 0.6)',
-            disabled: 'rgba(0, 0, 0, 0.38)',
+            primary: '#1e293b', // Slate-800
+            secondary: '#64748b', // Slate-500
+            disabled: '#94a3b8', // Slate-400
           },
+          divider: '#e2e8f0', // Slate-200
         }
       : {
-          // Dark mode
+          // Dark mode - Modern Dark Theme
           primary: {
-            main: '#90caf9',
-            light: '#e3f2fd',
-            dark: '#42a5f5',
-            contrastText: 'rgba(0, 0, 0, 0.87)',
+            main: '#818cf8', // Indigo-400
+            light: '#a5b4fc', // Indigo-300
+            dark: '#6366f1', // Indigo-500
+            contrastText: '#ffffff',
           },
           secondary: {
-            main: '#f48fb1',
-            light: '#f8bbd0',
-            dark: '#f06292',
-            contrastText: 'rgba(0, 0, 0, 0.87)',
+            main: '#f472b6', // Pink-400
+            light: '#fb7185', // Rose-400
+            dark: '#ec4899', // Pink-500
+            contrastText: '#ffffff',
           },
           background: {
-            default: '#121212',
-            paper: '#1e1e1e',
+            default: '#0f172a', // Slate-900
+            paper: '#1e293b', // Slate-800
+            alt: '#334155', // Slate-700
           },
           text: {
-            primary: '#ffffff',
-            secondary: 'rgba(255, 255, 255, 0.7)',
-            disabled: 'rgba(255, 255, 255, 0.5)',
+            primary: '#f1f5f9', // Slate-100
+            secondary: '#cbd5e1', // Slate-300
+            disabled: '#64748b', // Slate-500
           },
+          divider: '#334155', // Slate-700
         }),
     // Common colors for both modes
     error: {
@@ -94,9 +100,12 @@ export const getDesignTokens = (mode: PaletteMode) => ({
     },
     gradient: {
       primary: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-      secondary: mode === 'light' 
+      secondary: mode === 'light'
         ? 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)'
         : 'linear-gradient(135deg, #2c3e50 0%, #4ca1af 100%)',
+      background: mode === 'light'
+        ? 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)'
+        : 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
     },
   },
   components: {

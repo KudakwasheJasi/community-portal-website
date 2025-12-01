@@ -23,7 +23,7 @@
     "rootDir": "./src", // The base directory for resolving non-relative module names.
     "baseUrl": "./",
     "allowImportingTsExtensions": true,
-    "types": ["node", "jest", "express", "multer"],
+    "types": ["node"],
     "paths": {
       "@/*": ["src/*"]
     }

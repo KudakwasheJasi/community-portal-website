@@ -7,6 +7,8 @@ import type { AppProps } from 'next/app';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { AuthProvider } from '@/context/AuthContext';
+import { PostProvider } from '@/context/PostContext';
+import { EventProvider } from '@/context/EventContext';
 import AuthGuard from '@/components/AuthGuard';
 import createEmotionCache from '@/utils/createEmotionCache';
 import { ColorModeProvider } from '@/theme/ThemeProvider';
@@ -22,7 +24,7 @@ const ClientOnly = ({ children }: { children: React.ReactNode }) => {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     setMounted(true);
   }, []);
 
@@ -56,20 +58,7 @@ const App = (props: MyAppProps) => {
     }
   }, []);
 
-  // Client-side only wrapper
-  const ClientOnly = ({ children }: { children: React.ReactNode }) => {
-    const [mounted, setMounted] = useState(false);
 
-    useEffect(() => {
-      setMounted(true);
-    }, []);
-
-    if (!mounted) {
-      return null;
-    }
-
-    return <>{children}</>;
-  };
 
   return (
     <CacheProvider value={emotionCache}>
@@ -82,7 +71,11 @@ const App = (props: MyAppProps) => {
           <CssBaseline />
           <Toaster position="top-right" />
           <AuthProvider>
-            <Component {...pageProps} key={router.route} />
+            <PostProvider>
+              <EventProvider>
+                <Component {...pageProps} key={router.route} />
+              </EventProvider>
+            </PostProvider>
           </AuthProvider>
         </ColorModeProvider>
       </QueryClientProvider>

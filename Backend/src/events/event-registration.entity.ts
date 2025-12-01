@@ -1,43 +1,34 @@
 import {
   Entity,
-  Column,
   PrimaryGeneratedColumn,
-  CreateDateColumn,
+  Column,
   ManyToOne,
   JoinColumn,
-  Unique,
+  CreateDateColumn,
   Index,
 } from 'typeorm';
-import { User } from '../users/user.entity.ts';
-import { Event } from './event.entity.ts';
+import { User } from '../users/user.entity';
+import { Event } from './event.entity';
 
 @Entity('event_registrations')
-@Index(['userId', 'eventId'])
-@Unique(['userId', 'eventId'])
+@Index(['eventId', 'userId'], { unique: true }) // Prevent duplicate registrations
 export class EventRegistration {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column('uuid')
-  userId: string;
-
-  @Column('uuid')
+  @Column({ type: 'uuid' })
   eventId: string;
 
-  @ManyToOne(() => User, (user) => user.eventRegistrations, {
-    onDelete: 'CASCADE',
-  })
-  @JoinColumn({ name: 'userId' })
-  user: User;
+  @Column({ type: 'uuid' })
+  userId: string;
 
-  @ManyToOne(() => Event, (event) => event.registrations, {
-    onDelete: 'CASCADE',
-  })
+  @ManyToOne(() => Event, { eager: true })
   @JoinColumn({ name: 'eventId' })
   event: Event;
 
-  @Column({ default: false })
-  emailSent: boolean;
+  @ManyToOne(() => User, { eager: true })
+  @JoinColumn({ name: 'userId' })
+  user: User;
 
   @CreateDateColumn()
   registeredAt: Date;

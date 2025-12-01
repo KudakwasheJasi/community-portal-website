@@ -12,7 +12,7 @@
 **/
 import React from "react";
 import PostCard from "./PostCard";
-import { Post } from "@/services/posts.service";
+import { Post } from "@/types/post.types";
 
 interface BoardViewProps {
   posts: Post[];
@@ -21,7 +21,10 @@ interface BoardViewProps {
 }
 
 const BoardView: React.FC<BoardViewProps> = ({ posts, onEdit, onDelete }) => {
-  if (posts.length === 0) {
+  // Ensure posts is always an array
+  const postsArray = Array.isArray(posts) ? posts : [];
+
+  if (postsArray.length === 0) {
     return (
       <div style={{ textAlign: 'center', padding: '64px', border: '2px dashed #ddd' }}>
         <div style={{ fontSize: '48px', color: '#ccc', marginBottom: '16px' }}>📝</div>
@@ -32,7 +35,7 @@ const BoardView: React.FC<BoardViewProps> = ({ posts, onEdit, onDelete }) => {
 
   return (
     <div className='w-full py-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 2xl:gap-10'>
-      {posts.map((post) => (
+      {postsArray.map((post) => (
         <PostCard key={post.id} post={post} onEdit={onEdit} onDelete={onDelete} />
       ))}
     </div>

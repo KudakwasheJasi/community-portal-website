@@ -31,8 +31,11 @@ export class PostQueryDto {
   status?: PostStatus;
 
   @IsOptional()
-  @IsEnum(PostVisibility)
-  @Transform(({ value }) => (Array.isArray(value) ? value : [value]) as PostVisibility[])
+  @IsEnum(PostVisibility, { each: true })
+  @Transform(({ value }) => {
+    if (!value) return undefined;
+    return Array.isArray(value) ? value : [value];
+  })
   visibility?: PostVisibility[];
 
   // Relationships
@@ -79,3 +82,4 @@ export class PostQueryDto {
   @Transform(({ value }) => value === 'true')
   includeLikes?: boolean = false;
 }
+

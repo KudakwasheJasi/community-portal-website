@@ -18,11 +18,12 @@ export const databaseConfig = (
     };
   } else {
     return {
-      type: 'better-sqlite3',
-      database: configService.get('DB_DATABASE', './database.sqlite'),
+      type: 'postgres',
+      url: configService.get('DATABASE_URL'),
       entities: [__dirname + '/../**/*.entity{.ts,.js}'],
       synchronize: true, // Only for development
       logging: true, // Only for development
+      connectTimeoutMS: 60000, // 60 second timeout
     };
   }
 };

@@ -14,6 +14,14 @@ interface EventCardProps {
 }
 
 const EventCard: React.FC<EventCardProps> = ({ data }) => {
+  // Format date and time from startDate
+  const startDate = new Date(data.startDate);
+  const date = startDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+  const time = startDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+
+  // Generate a default image URL based on event title
+  const imageUrl = `https://via.placeholder.com/400x200?text=${encodeURIComponent(data.title)}`;
+
   return (
     <Card
       sx={{
@@ -30,7 +38,7 @@ const EventCard: React.FC<EventCardProps> = ({ data }) => {
         sx={{
           height: 128,
           width: '100%',
-          backgroundImage: `url(${data.imageUrl})`,
+          backgroundImage: `url(${imageUrl})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           position: 'relative',
@@ -48,7 +56,7 @@ const EventCard: React.FC<EventCardProps> = ({ data }) => {
             {data.title}
           </Typography>
           <Typography variant="caption" sx={{ opacity: 0.9, fontWeight: 500 }}>
-            {data.date} • {data.time}
+            {date} • {time}
           </Typography>
         </Box>
       </Box>

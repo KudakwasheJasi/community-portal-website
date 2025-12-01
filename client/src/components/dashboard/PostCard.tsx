@@ -55,7 +55,7 @@ const PostCard: React.FC<PostCardProps> = ({ data }) => {
               startIcon={<FavoriteBorder sx={{ fontSize: 18 }} />}
               sx={{ color: 'text.secondary', minWidth: 0, px: 1, '&:hover': { color: 'error.main' } }}
             >
-              {data.views}
+              {data.viewCount}
             </Button>
             <Button
               size="small"

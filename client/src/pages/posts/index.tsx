@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
 import {
   Button,
@@ -12,10 +12,12 @@ import {
 } from '@mui/material';
 import { ViewList, GridView, Refresh } from '@mui/icons-material';
 import MainDashboardLayout from '@/components/dashboard/MainDashboardLayout';
+import AuthGuard from '@/components/AuthGuard';
 import CreateEditPostDialog from '@/components/posts/CreateEditPostDialog';
 import BoardView from '@/components/posts/BoardView';
 import ListView from '@/components/posts/ListView';
-import postsService, { Post } from '@/services/posts.service';
+import { usePosts } from '@/context/PostContext';
+import { Post } from '@/types/post.types';
 
 type ViewMode = 'list' | 'board';
 
@@ -28,28 +30,18 @@ interface PostFormData {
 }
 
 const PostsPage: React.FC = () => {
-  const [posts, setPosts] = useState<Post[]>([]);
+  return (
+    <AuthGuard>
+      <PostsPageContent />
+    </AuthGuard>
+  );
+};
+
+const PostsPageContent: React.FC = () => {
+  const { posts, loading, error, createPost, updatePost, deletePost, fetchPosts, clearError } = usePosts();
   const [viewMode, setViewMode] = useState<ViewMode>('board');
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingPostId, setEditingPostId] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-
-  useEffect(() => {
-    const loadPosts = async () => {
-      try {
-        setLoading(true);
-        setError('');
-        const fetchedPosts = await postsService.getAll();
-        setPosts(fetchedPosts);
-      } catch (err: unknown) {
-        setError(err instanceof Error ? err.message : 'Failed to load posts');
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadPosts();
-  }, []);
 
   const activePostData = editingPostId ? (() => {
     const post = posts.find(p => p.id === editingPostId);
@@ -57,7 +49,7 @@ const PostsPage: React.FC = () => {
       id: post.id,
       title: post.title,
       description: post.description || '',
-      status: post.status
+      status: post.status.toLowerCase() as 'published' | 'draft' | 'archived'
     } : undefined;
   })() : undefined;
 
@@ -74,52 +66,43 @@ const PostsPage: React.FC = () => {
   const handleDelete = async (id: string) => {
     if (window.confirm('Are you sure you want to delete this post?')) {
       try {
-        setLoading(true);
-        setError('');
-        await postsService.delete(id);
-        setPosts(prev => prev.filter(post => post.id !== id));
+        clearError();
+        await deletePost(id);
       } catch (err: unknown) {
-        setError(err instanceof Error ? err.message : 'Failed to delete post');
-      } finally {
-        setLoading(false);
+        // Error is handled by context
       }
     }
   };
 
   const handleSave = async (data: PostFormData) => {
     try {
-      setLoading(true);
-      setError('');
+      clearError();
       if (data.id) {
-        const updatedPost = await postsService.update(data.id, {
-          id: data.id,
+        await updatePost(data.id, {
           title: data.title,
           content: data.description,
           status: data.status
         }, data.file);
-        setPosts(prev => prev.map(post => post.id === data.id ? updatedPost : post));
       } else {
-        const newPost = await postsService.create({
+        await createPost({
           title: data.title,
           content: data.description,
           status: data.status
         }, data.file);
-        setPosts(prev => [newPost, ...prev]);
       }
       setDialogOpen(false);
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Failed to save post');
-    } finally {
-      setLoading(false);
+      // Error is handled by context
     }
   };
 
-  const handleRefresh = () => {
-    setLoading(true);
-    // Simulate refresh
-    setTimeout(() => {
-      setLoading(false);
-    }, 1000);
+  const handleRefresh = async () => {
+    try {
+      clearError();
+      await fetchPosts();
+    } catch (err: unknown) {
+      // Error is handled by context
+    }
   };
 
   return (

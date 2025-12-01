@@ -42,7 +42,16 @@ api.interceptors.request.use((config) => {
 
 export const authService = {
   async register(credentials: RegisterCredentials): Promise<AuthResponse> {
-    const response = await api.post('/auth/register', credentials);
+    const [firstName, ...lastNameParts] = credentials.name.split(' ');
+    const lastName = lastNameParts.join(' ');
+    const payload = {
+      firstName,
+      lastName,
+      email: credentials.email,
+      password: credentials.password,
+      phoneNumber: credentials.mobileNumber,
+    };
+    const response = await api.post('/auth/register', payload);
     return response.data;
   },
 

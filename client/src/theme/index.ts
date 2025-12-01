@@ -1,13 +1,10 @@
-import { createTheme } from '@mui/material/styles';
-import { getDesignTokens } from './palette';
-import { components } from './components';
-import { typography } from './typography';
+import { createTheme } from "@mui/material/styles";
+import { getDesignTokens } from "./palette";
+import { components } from "./components";
+import typography from "./typography";
 
-// Create a theme instance
-const theme = createTheme({
-  ...getDesignTokens('light'),
+const baseOptions = {
   typography,
-  components: components(createTheme({ ...getDesignTokens('light'), typography })),
   shape: {
     borderRadius: 8,
   },
@@ -41,6 +38,26 @@ const theme = createTheme({
     snackbar: 1400,
     tooltip: 1500,
   },
+};
+
+const baseLightTheme = createTheme({
+  ...baseOptions,
+  ...getDesignTokens('light'),
 });
 
-export default theme;
+const lightTheme = createTheme({
+  ...baseLightTheme,
+  components: components(baseLightTheme),
+});
+
+const baseDarkTheme = createTheme({
+  ...baseOptions,
+  ...getDesignTokens('dark'),
+});
+
+const darkTheme = createTheme({
+  ...baseDarkTheme,
+  components: components(baseDarkTheme),
+});
+
+export { lightTheme, darkTheme };

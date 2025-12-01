@@ -28,7 +28,7 @@ export default (): AppConfig => ({
   database: {
     url:
       process.env.DATABASE_URL ||
-      'postgresql://username:password@localhost:5432/community_portal_dev',
+      'postgresql://postgres:zz@localhost:1943/community_portal',
   },
 
   // MongoDB

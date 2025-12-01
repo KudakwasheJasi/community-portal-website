@@ -80,6 +80,6 @@ export class User {
   }
 
   get fullName(): string {
-    return `${this.firstName} ${this.lastName}`;
+    return this.lastName ? `${this.firstName} ${this.lastName}` : this.firstName;
   }
 }

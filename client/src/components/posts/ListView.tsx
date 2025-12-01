@@ -29,7 +29,7 @@ import {
   Delete as DeleteIcon,
   Visibility as VisibilityIcon,
 } from "@mui/icons-material";
-import { Post } from "@/services/posts.service";
+import { Post } from "@/types/post.types";
 
 interface ListViewProps {
   posts: Post[];
@@ -38,6 +38,9 @@ interface ListViewProps {
 }
 
 const ListView: React.FC<ListViewProps> = ({ posts, onEdit, onDelete }) => {
+  // Ensure posts is always an array
+  const postsArray = Array.isArray(posts) ? posts : [];
+
   const getStatusColor = (status: string): 'success' | 'warning' | 'default' => {
     switch (status) {
       case 'published':
@@ -65,8 +68,8 @@ const ListView: React.FC<ListViewProps> = ({ posts, onEdit, onDelete }) => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {posts.length > 0 ? (
-              posts.map((post) => (
+            {postsArray.length > 0 ? (
+              postsArray.map((post) => (
                 <TableRow
                   key={post.id}
                   hover

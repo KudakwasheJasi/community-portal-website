@@ -1,95 +1,44 @@
-export const typography = {
-  fontFamily: [
-    '-apple-system',
-    'BlinkMacSystemFont',
-    '"Segoe UI"',
-    'Roboto',
-    '"Helvetica Neue"',
-    'Arial',
-    'sans-serif',
-    '"Apple Color Emoji"',
-    '"Segoe UI Emoji"',
-    '"Segoe UI Symbol"',
-  ].join(','),
+import type { TypographyVariantsOptions } from "@mui/material";
+
+const typography: TypographyVariantsOptions = {
+  fontFamily: "'Public Sans', sans-serif",
+
   h1: {
+    fontFamily: "'Inter', sans-serif",
+    fontSize: "4.25rem",
     fontWeight: 600,
-    fontSize: '2.5rem',
-    lineHeight: 1.2,
-    letterSpacing: '-0.01562em',
   },
   h2: {
-    fontWeight: 600,
-    fontSize: '2rem',
-    lineHeight: 1.2,
-    letterSpacing: '-0.00833em',
+    fontFamily: "'Inter', sans-serif",
+    fontSize: "3.25rem",
+    fontWeight: 500,
   },
   h3: {
-    fontWeight: 600,
-    fontSize: '1.75rem',
-    lineHeight: 1.2,
-    letterSpacing: '0em',
-  },
-  h4: {
-    fontWeight: 600,
-    fontSize: '1.5rem',
-    lineHeight: 1.2,
-    letterSpacing: '0.00735em',
+    fontFamily: "'Inter', sans-serif",
+    fontWeight: 400,
+    fontSize: "2.25rem",
   },
   h5: {
-    fontWeight: 600,
-    fontSize: '1.25rem',
-    lineHeight: 1.2,
-    letterSpacing: '0em',
+    fontFamily: "'Inter', sans-serif",
+    fontWeight: 400,
+    fontSize: "1.75rem",
   },
   h6: {
-    fontWeight: 600,
-    fontSize: '1rem',
-    lineHeight: 1.2,
-    letterSpacing: '0.0075em',
-  },
-  subtitle1: {
-    fontWeight: 400,
-    fontSize: '1rem',
-    lineHeight: 1.5,
-    letterSpacing: '0.00938em',
-  },
-  subtitle2: {
+    fontFamily: "'Inter', sans-serif",
     fontWeight: 500,
-    fontSize: '0.875rem',
-    lineHeight: 1.57,
-    letterSpacing: '0.00714em',
+    fontSize: "1.25rem",
   },
+
   body1: {
+    fontSize: "1rem",
     fontWeight: 400,
-    fontSize: '1rem',
-    lineHeight: 1.5,
-    letterSpacing: '0.00938em',
   },
-  body2: {
-    fontWeight: 400,
-    fontSize: '0.875rem',
-    lineHeight: 1.5,
-    letterSpacing: '0.01071em',
-  },
+
   button: {
-    fontWeight: 500,
-    fontSize: '0.875rem',
-    lineHeight: 1.75,
-    letterSpacing: '0.02857em',
-    textTransform: 'none',
-  },
-  caption: {
-    fontWeight: 400,
-    fontSize: '0.75rem',
-    lineHeight: 1.66,
-    letterSpacing: '0.03333em',
-  },
-  overline: {
-    fontWeight: 400,
-    fontSize: '0.75rem',
-    lineHeight: 2.66,
-    letterSpacing: '0.08333em',
-    textTransform: 'uppercase',
+    fontSize: "1rem",
+    textTransform: "none",
+    fontWeight: 600,
+    fontFamily: "'Inter', sans-serif",
   },
 };
 

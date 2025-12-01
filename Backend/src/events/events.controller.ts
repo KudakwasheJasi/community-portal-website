@@ -2,118 +2,149 @@ import {
   Controller,
   Get,
   Post,
-  Body,
-  Patch,
-  Param,
+  Put,
   Delete,
+  Body,
+  Param,
   UseGuards,
   Request,
-  ParseUUIDPipe,
-  UseInterceptors,
-  ClassSerializerInterceptor,
-  Logger,
+  BadRequestException,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard.ts';
-import { EventsService } from './events.service.ts';
-import { Event } from './event.entity.ts';
-import { EventRegistration } from './event-registration.entity.ts';
-import { User } from '../users/user.entity.ts';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiResponse,
-  ApiBearerAuth,
-} from '@nestjs/swagger';
+import { EventsService } from './events.service';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { CreateEventDto } from './dto/create-event.dto';
+import { UpdateEventDto } from './dto/update-event.dto';
 
-@ApiTags('events')
+interface AuthenticatedRequest extends Request {
+  user: { id: string; username: string };
+}
+
 @Controller('events')
-@UseInterceptors(ClassSerializerInterceptor)
-@ApiBearerAuth()
+@UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
 export class EventsController {
-  private readonly logger = new Logger(EventsController.name);
   constructor(private readonly eventsService: EventsService) {}
 
   @Get()
-  @ApiOperation({ summary: 'Get all events' })
-  @ApiResponse({ status: 200, description: 'Return all events.' })
-  async findAll(): Promise<Event[]> {
-    return this.eventsService.findAll();
+  async findAll() {
+    try {
+      return await this.eventsService.findAll();
+    } catch (error) {
+      throw new BadRequestException(
+        error instanceof Error ? error.message : 'Failed to fetch events',
+      );
+    }
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Get event by ID' })
-  @ApiResponse({ status: 200, description: 'Return the event.' })
-  @ApiResponse({ status: 404, description: 'Event not found.' })
-  async findOne(@Param('id', ParseUUIDPipe) id: string): Promise<Event> {
-    return this.eventsService.findOne(id);
+  async findOne(@Param('id') id: string) {
+    try {
+      return await this.eventsService.findOne(id);
+    } catch (error) {
+      if (error instanceof BadRequestException) throw error;
+      throw new BadRequestException(
+        error instanceof Error ? error.message : 'Invalid event ID',
+      );
+    }
   }
 
-  @Get('organizer/:organizerId')
   @UseGuards(JwtAuthGuard)
-  findByOrganizer(
-    @Param('organizerId', ParseUUIDPipe) organizerId: string,
-  ): Promise<Event[]> {
-    return this.eventsService.findByOrganizer(organizerId);
-  }
-
   @Post()
-  @UseGuards(JwtAuthGuard)
-  create(
-    @Body() createEventData: Partial<Event>,
-    @Request() req: { user: User },
-  ): Promise<Event> {
-    return this.eventsService.create({
-      ...createEventData,
-      organizerId: req.user.id,
-    });
+  async create(
+    @Body() createEventDto: CreateEventDto,
+    @Request() req: AuthenticatedRequest,
+  ) {
+    try {
+      return await this.eventsService.create(createEventDto, req.user.id);
+    } catch (error) {
+      throw new BadRequestException(
+        error instanceof Error ? error.message : 'Failed to create event',
+      );
+    }
   }
 
-  @Patch(':id')
   @UseGuards(JwtAuthGuard)
-  update(
-    @Param('id', ParseUUIDPipe) id: string,
-    @Body() updateData: Partial<Event>,
-  ): Promise<Event> {
-    return this.eventsService.update(id, updateData);
+  @Put(':id')
+  async update(
+    @Param('id') id: string,
+    @Body() updateEventDto: UpdateEventDto,
+    @Request() req: AuthenticatedRequest,
+  ) {
+    try {
+      return await this.eventsService.update(id, updateEventDto, req.user.id);
+    } catch (error) {
+      if (error instanceof BadRequestException) throw error;
+      throw new BadRequestException('Failed to update event');
+    }
   }
 
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
-  @UseGuards(JwtAuthGuard)
-  remove(@Param('id', ParseUUIDPipe) id: string): Promise<void> {
-    return this.eventsService.remove(id);
+  async remove(@Param('id') id: string, @Request() req: AuthenticatedRequest) {
+    try {
+      await this.eventsService.remove(id, req.user.id);
+      return { message: 'Event deleted successfully' };
+    } catch (error) {
+      if (error instanceof BadRequestException) throw error;
+      throw new BadRequestException('Failed to delete event');
+    }
   }
 
+  @UseGuards(JwtAuthGuard)
   @Post(':id/register')
-  @UseGuards(JwtAuthGuard)
-  registerForEvent(
-    @Param('id', ParseUUIDPipe) eventId: string,
-    @Request() req: { user: User },
-  ): Promise<EventRegistration> {
-    return this.eventsService.registerForEvent(eventId, req.user.id);
+  async registerForEvent(
+    @Param('id') eventId: string,
+    @Request() req: AuthenticatedRequest,
+  ) {
+    try {
+      return await this.eventsService.registerForEvent(eventId, req.user.id);
+    } catch (error) {
+      if (error instanceof BadRequestException) throw error;
+      throw new BadRequestException(
+        error instanceof Error ? error.message : 'Failed to register for event',
+      );
+    }
   }
 
+  @UseGuards(JwtAuthGuard)
   @Delete(':id/register')
-  @UseGuards(JwtAuthGuard)
-  unregisterFromEvent(
-    @Param('id', ParseUUIDPipe) eventId: string,
-    @Request() req: { user: User },
-  ): Promise<void> {
-    return this.eventsService.unregisterFromEvent(eventId, req.user.id);
+  async unregisterFromEvent(
+    @Param('id') eventId: string,
+    @Request() req: AuthenticatedRequest,
+  ) {
+    try {
+      await this.eventsService.unregisterFromEvent(eventId, req.user.id);
+      return { message: 'Successfully unregistered from event' };
+    } catch (error) {
+      if (error instanceof BadRequestException) throw error;
+      throw new BadRequestException(
+        error instanceof Error ? error.message : 'Failed to unregister from event',
+      );
+    }
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get(':id/registrations')
-  @UseGuards(JwtAuthGuard)
-  getEventRegistrations(
-    @Param('id', ParseUUIDPipe) eventId: string,
-  ): Promise<EventRegistration[]> {
-    return this.eventsService.getEventRegistrations(eventId);
+  async getEventRegistrations(@Param('id') eventId: string) {
+    try {
+      return await this.eventsService.getEventRegistrations(eventId);
+    } catch (error) {
+      throw new BadRequestException(
+        error instanceof Error ? error.message : 'Failed to fetch event registrations',
+      );
+    }
   }
 
-  @Get('user/registrations')
   @UseGuards(JwtAuthGuard)
-  getUserRegistrations(
-    @Request() req: { user: User },
-  ): Promise<EventRegistration[]> {
-    return this.eventsService.getUserRegistrations(req.user.id);
+  @Get('user/registrations')
+  async getUserRegistrations(@Request() req: AuthenticatedRequest) {
+    try {
+      return await this.eventsService.getUserRegistrations(req.user.id);
+    } catch (error) {
+      throw new BadRequestException(
+        error instanceof Error ? error.message : 'Failed to fetch user registrations',
+      );
+    }
   }
 }

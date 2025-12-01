@@ -1,42 +1,9 @@
 import { Components, Theme } from '@mui/material';
+import Button from './Button';
+import Input from './Input';
 
-export const components = (theme: Theme): Components => ({
-  MuiButton: {
-    styleOverrides: {
-      root: {
-        borderRadius: 8,
-        textTransform: 'none',
-        fontWeight: 500,
-        padding: '8px 24px',
-        boxShadow: 'none',
-        '&:hover': {
-          boxShadow: 'none',
-          opacity: 0.9,
-        },
-      },
-      contained: {
-        background: theme.palette.gradient.primary,
-        color: theme.palette.primary.contrastText,
-        '&:hover': {
-          background: theme.palette.primary.dark,
-        },
-      },
-      outlined: {
-        border: `1px solid ${theme.palette.primary.main}`,
-        '&:hover': {
-          backgroundColor: 'transparent',
-          borderColor: theme.palette.primary.dark,
-          color: theme.palette.primary.dark,
-        },
-      },
-      text: {
-        '&:hover': {
-          backgroundColor: 'transparent',
-          color: theme.palette.primary.dark,
-        },
-      },
-    },
-  },
+export const components = (theme: Theme): Components<Theme> => ({
+  ...Input(theme),
   MuiTextField: {
     styleOverrides: {
       root: {

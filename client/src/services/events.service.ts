@@ -21,17 +21,25 @@ api.interceptors.request.use((config) => {
 export interface Event {
   id: string;
   title: string;
-  date: string;
-  time: string;
-  location?: string;
-  description?: string;
-  imageUrl: string;
-  isFeatured?: boolean;
-  status: 'open' | 'registered' | 'closed';
-  tags: string[];
-  organizerId?: string;
-  createdAt?: string;
-  updatedAt?: string;
+  description: string;
+  location: string;
+  startDate: Date;
+  endDate: Date;
+  maxAttendees: number;
+  organizerId: string;
+  organizer?: {
+    id: string;
+    name: string;
+    email: string;
+  };
+  registrations?: {
+    id: string;
+    userId: string;
+    registeredAt: string;
+  }[];
+  status?: 'open' | 'registered' | 'closed';
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface EventRegistration {

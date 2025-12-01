@@ -8,7 +8,7 @@
     * - Version         : 1.0.0
     * - Date            : 15/07/2025
     * - Author          : kudakwashe Ellijah
-    * - Modification    :
+    * - Modification    : Added delete/edit functionality and code display
 **/
 import clsx from "clsx";
 import React, { useState } from "react";
@@ -20,22 +20,20 @@ import {
   Delete,
   Visibility,
   Message,
-  List,
-  Add,
 } from "@mui/icons-material";
 import { Button, IconButton } from "@mui/material";
-import { Post } from "@/services/posts.service";
+import { Post } from "../../types/post.types";
 
 const STATUS_STYLES = {
-  published: "text-green-600 bg-green-100",
-  draft: "text-yellow-600 bg-yellow-100",
-  archived: "text-gray-600 bg-gray-100",
+  PUBLISHED: "text-green-600 bg-green-100",
+  DRAFT: "text-yellow-600 bg-yellow-100",
+  ARCHIVED: "text-gray-600 bg-gray-100",
 };
 
 const STATUS_ICONS = {
-  published: <KeyboardDoubleArrowUp />,
-  draft: <KeyboardArrowUp />,
-  archived: <KeyboardArrowDown />,
+  PUBLISHED: <KeyboardDoubleArrowUp />,
+  DRAFT: <KeyboardArrowUp />,
+  ARCHIVED: <KeyboardArrowDown />,
 };
 
 interface PostCardProps {
@@ -95,7 +93,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, onEdit, onDelete }) => {
         <h4 className='line-clamp-1 text-black dark:text-white'>{post.title}</h4>
       </div>
       <span className='text-sm text-gray-600'>
-        {post.date ? new Date(post.date).toLocaleDateString() : 'No date'}
+        {post.publishedAt ? new Date(post.publishedAt).toLocaleDateString() : post.createdAt ? new Date(post.createdAt).toLocaleDateString() : 'No date'}
       </span>
 
       <div className='w-full border-t border-gray-200 my-2' />
@@ -103,21 +101,21 @@ const PostCard: React.FC<PostCardProps> = ({ post, onEdit, onDelete }) => {
         <div className='flex items-center gap-3'>
           <div className='flex gap-1 items-center text-sm text-gray-600'>
             <Visibility />
-            <span>{post.views}</span>
+            <span>{post.viewCount}</span>
           </div>
           <div className='flex gap-1 items-center text-sm text-gray-600'>
             <Message />
-            <span>0</span> {/* Placeholder for comments */}
+            <span>{post.commentCount}</span>
           </div>
           <div className='flex gap-1 items-center text-sm text-gray-600'>
             <AttachFile />
-            <span>0</span> {/* Placeholder for attachments */}
+            <span>{post.images?.length || 0}</span>
           </div>
         </div>
 
         <div className='flex flex-row-reverse'>
           <div className="w-7 h-7 rounded-full bg-blue-500 text-white flex items-center justify-center text-sm">
-            {String(post.author || '').charAt(0).toUpperCase() || 'U'}
+            {(post.author?.username || post.authorName || 'U').charAt(0).toUpperCase()}
           </div>
         </div>
       </div>
@@ -130,9 +128,9 @@ const PostCard: React.FC<PostCardProps> = ({ post, onEdit, onDelete }) => {
 
       {post.tags && post.tags.length > 0 && (
         <div className='flex flex-wrap gap-1 mt-2'>
-          {post.tags.map((tag, index) => (
-            <span key={index} className='bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full'>
-              {tag}
+          {post.tags.map((tag) => (
+            <span key={tag.id} className='bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full'>
+              {tag.name}
             </span>
           ))}
         </div>

@@ -40,7 +40,7 @@ export class AuthService {
       email,
       password: hashedPassword,
       firstName,
-      lastName,
+      lastName: lastName || '',
       phoneNumber,
     });
 
