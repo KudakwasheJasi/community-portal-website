@@ -9,9 +9,14 @@ import {
   Button,
   Box,
   Grid,
+  GridProps,
   CircularProgress,
   Typography,
   Alert,
+  FilledTextFieldProps,
+  OutlinedTextFieldProps,
+  StandardTextFieldProps,
+  TextFieldVariants,
 } from '@mui/material';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -19,6 +24,7 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { CloudUpload as CloudUploadIcon } from '@mui/icons-material';
 import eventsService from '@/services/events.service';
 import { uploadFile, validateImage } from '@/utils/fileUpload';
+import { JSX } from 'react/jsx-runtime';
 
 type EventData = {
   id: string;
@@ -162,6 +168,7 @@ const EventForm: React.FC<EventFormProps> = ({ open, onClose, onSubmit, isEdit =
         imageFile: file,
       }));
       setPreviewUrl(imageUrl);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       setUploadError('Failed to upload image. Please try again.');
     } finally {
@@ -253,7 +260,7 @@ const EventForm: React.FC<EventFormProps> = ({ open, onClose, onSubmit, isEdit =
           <DialogContent>
             <Box sx={{ pt: 1 }}>
               <Grid container spacing={3}>
-                <Grid item xs={12}>
+                <Grid size= {{ xs:12, md:4,}} component="div">
                   <TextField
                     fullWidth
                     label="Event Title"
@@ -264,8 +271,9 @@ const EventForm: React.FC<EventFormProps> = ({ open, onClose, onSubmit, isEdit =
                     required
                   />
                 </Grid>
-
-                <Grid item xs={12}>
+                
+          
+                <Grid size= {{ xs:12, md:4}} component="div">
                   <TextField
                     fullWidth
                     label="Description"
@@ -278,7 +286,7 @@ const EventForm: React.FC<EventFormProps> = ({ open, onClose, onSubmit, isEdit =
                   />
                 </Grid>
 
-                <Grid item xs={12} md={6}>
+                <Grid size= {{ xs:12, md:3}} component="div">
                   <TextField
                     fullWidth
                     label="Location"
@@ -289,7 +297,7 @@ const EventForm: React.FC<EventFormProps> = ({ open, onClose, onSubmit, isEdit =
                   />
                 </Grid>
 
-                <Grid item xs={12} md={6}>
+                <Grid size= {{ xs:12, sm:4}} component="div">
                   <TextField
                     fullWidth
                     label="Max Attendees"
@@ -302,22 +310,25 @@ const EventForm: React.FC<EventFormProps> = ({ open, onClose, onSubmit, isEdit =
                   />
                 </Grid>
 
-                <Grid item xs={12} md={6}>
-                  <DateTimePicker
-                    label="Start Date & Time"
-                    value={formData.startDate}
-                    onChange={handleDateChange('startDate')}
-                    slotProps={{
-                      textField: {
-                        fullWidth: true,
-                        error: !!formErrors.startDate,
+                <Grid size ={{xs:12, sm:2}} component="div">
+                  <LocalizationProvider dateAdapter={AdapterDateFns}>
+                    <DateTimePicker
+                      label="Start Date & Time"
+                      value={formData.startDate}
+                      onChange={handleDateChange('startDate')}
+                      slotProps={{
+                           textField: {
+                           fullWidth: true,
+                          error: !!formErrors.startDate,
                         helperText: formErrors.startDate,
-                      },
-                    }}
-                  />
+                        required: true,
+                       },
+                      }}
+                    />
+                  </LocalizationProvider>
                 </Grid>
 
-                <Grid item xs={12} md={6}>
+                <Grid size = {{ xs:12, sm:6,}} component="div">
                   <DateTimePicker
                     label="End Date & Time"
                     value={formData.endDate}
@@ -332,13 +343,11 @@ const EventForm: React.FC<EventFormProps> = ({ open, onClose, onSubmit, isEdit =
                   />
                 </Grid>
 
-                <Grid item xs={12} md={8}>
+                <Grid size ={{ xs:12, md:4}}>
                   <Box>
                     <Typography variant="subtitle1" gutterBottom>
                       Event Image
                     </Typography>
-
-                    {/* File Upload Input */}
                     <Box
                       sx={{
                         border: '2px dashed',
@@ -423,7 +432,7 @@ const EventForm: React.FC<EventFormProps> = ({ open, onClose, onSubmit, isEdit =
                   </Box>
                 </Grid>
 
-                <Grid item xs={12} md={4}>
+                <Grid size= {{ xs:12, md:4}}>
                   <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
                     <Typography variant="subtitle1" gutterBottom>
                       Quick Actions

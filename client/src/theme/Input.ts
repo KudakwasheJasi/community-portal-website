@@ -78,10 +78,6 @@ const Input = (theme: Theme): Components<Theme> => ({
           minHeight: 32,
           height: 32,
         },
-        "& .MuiOutlinedInput-notchedOutline": {
-          borderColor: theme.palette.primary.main,
-          borderWidth: "2px",
-        },
         "&.Mui-focused": {
           backgroundColor: 'transparent !important',
           '& .MuiOutlinedInput-notchedOutline': {

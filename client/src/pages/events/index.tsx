@@ -16,21 +16,19 @@ import AuthGuard from '@/components/AuthGuard';
 import EventList from '@/components/events/EventList';
 import EventForm from '@/components/events/EventForm';
 import { useEvents } from '@/context/EventContext';
-import eventsService from '@/services/events.service';
+import eventsService, { CreateEventData } from '@/services/events.service';
 
 const EventsPage = () => {
   const router = useRouter();
   const [showEventForm, setShowEventForm] = useState(false);
   const { events, loading, error, fetchEvents } = useEvents();
 
-  const handleCreateEvent = useCallback(async (eventData) => {
+  const handleCreateEvent = useCallback(async (eventData: CreateEventData) => {
     try {
       await eventsService.create(eventData);
       await fetchEvents(); // Refresh events after creation
-      return true;
     } catch (error) {
       console.error('Error creating event:', error);
-      return false;
     }
   }, [fetchEvents]);
 
