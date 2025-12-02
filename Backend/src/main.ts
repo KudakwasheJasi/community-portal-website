@@ -23,7 +23,7 @@ async function bootstrap() {
     'http://localhost:3000',
     'http://localhost:3001',
     'https://community-portal-website.onrender.com',
-    'https://client-r02b6gz9x-kudakwashejasis-projects.vercel.app'
+    'https://community-portal-website.vercel.app'
   ];
   
   app.enableCors({
