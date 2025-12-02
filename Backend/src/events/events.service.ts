@@ -11,6 +11,7 @@ import { EventRegistration } from './event-registration.entity';
 import { User } from '../users/user.entity';
 import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
+import { NotificationsService } from '../notifications/notifications.service';
 
 @Injectable()
 export class EventsService {
@@ -21,6 +22,7 @@ export class EventsService {
     private registrationRepository: Repository<EventRegistration>,
     @InjectRepository(User)
     private userRepository: Repository<User>,
+    private notificationsService: NotificationsService,
   ) {}
 
   async findAll(): Promise<Event[]> {
@@ -250,7 +252,35 @@ export class EventsService {
       user,
     });
 
-    return this.registrationRepository.save(registration);
+    const savedRegistration = await this.registrationRepository.save(registration);
+
+    // Send email notifications (don't await to avoid blocking)
+    try {
+      // Send confirmation email to the user
+      this.notificationsService.sendEventRegistrationConfirmation(
+        user.email,
+        user.firstName + ' ' + user.lastName,
+        event.title,
+        event.startDate,
+        event.location,
+      );
+
+      // Send notification email to the organizer
+      if (event.organizer && event.organizer.email) {
+        this.notificationsService.sendEventRegistrationNotificationToOrganizer(
+          event.organizer.email,
+          event.organizer.firstName + ' ' + event.organizer.lastName,
+          user.firstName + ' ' + user.lastName,
+          user.email,
+          event.title,
+        );
+      }
+    } catch (error) {
+      // Log error but don't fail the registration
+      console.error('Failed to send registration emails:', error);
+    }
+
+    return savedRegistration;
   }
 
   async unregisterFromEvent(eventId: string, userId: string): Promise<void> {
