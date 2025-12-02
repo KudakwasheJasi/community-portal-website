@@ -5,10 +5,9 @@ import {
   IsEnum,
   IsArray,
   IsUUID,
-  IsUrl,
   IsNotEmpty,
 } from 'class-validator';
-import { PostStatus, PostVisibility } from '../post.entity';
+import { PostVisibility } from '../post.entity';
 
 export class CreatePostDto {
   @IsString()
@@ -35,9 +34,9 @@ export class CreatePostDto {
   @IsOptional()
   visibility?: PostVisibility = PostVisibility.PUBLIC;
 
-  @IsUrl()
+  @IsString()
   @IsOptional()
-  featuredImage?: string;
+  imageUrl?: string;
 
   @IsArray()
   @IsString({ each: true })
