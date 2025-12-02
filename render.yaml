@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: community-portal-backend
+    runtime: docker
+    dockerfilePath: ./Backend/Dockerfile
+    dockerContext: .
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: community-portal-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: FRONTEND_URL
+        value: https://client-9anhkhan8-kudakwashejasis-projects.vercel.app
+
+databases:
+  - name: community-portal-db
+    databaseName: community_portal
+    user: postgres
+    plan: free
