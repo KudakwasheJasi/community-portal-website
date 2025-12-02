@@ -19,5 +19,4 @@ services:
 databases:
   - name: community-portal-db
     databaseName: community_portal
-    user: postgres
     plan: free
