@@ -12,8 +12,9 @@ export enum PostVisibility {
 
 export interface User {
   id: string;
-  username: string;
+  name: string;
   email: string;
+  username?: string;
   avatar?: string;
 }
 

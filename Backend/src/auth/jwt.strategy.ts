@@ -6,6 +6,7 @@ import { AuthService } from './auth.service';
 
 interface JwtPayload {
   sub: string;
+  email: string;
   iat?: number;
   exp?: number;
 }
@@ -19,7 +20,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: configService.get('JWT_SECRET', 'your-secret-key'),
+      secretOrKey: 'ef4f8351d93d1b9ab24ec359259a7e5e',
     });
   }
 

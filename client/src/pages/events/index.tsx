@@ -16,11 +16,12 @@ import AuthGuard from '@/components/AuthGuard';
 import EventList from '@/components/events/EventList';
 import EventForm from '@/components/events/EventForm';
 import { useEvents } from '@/context/EventContext';
-import eventsService, { CreateEventData } from '@/services/events.service';
+import eventsService, { CreateEventData, Event } from '@/services/events.service';
 
 const EventsPage = () => {
   const router = useRouter();
   const [showEventForm, setShowEventForm] = useState(false);
+  const [editingEvent, setEditingEvent] = useState<Event | null>(null);
   const { events, loading, error, fetchEvents } = useEvents();
 
   const handleCreateEvent = useCallback(async (eventData: CreateEventData) => {
@@ -31,6 +32,38 @@ const EventsPage = () => {
       console.error('Error creating event:', error);
     }
   }, [fetchEvents]);
+
+  const handleEditEvent = useCallback(async (eventData: CreateEventData) => {
+    try {
+      if (editingEvent) {
+        await eventsService.update(editingEvent.id, eventData);
+        await fetchEvents(); // Refresh events after update
+      }
+    } catch (error) {
+      console.error('Error updating event:', error);
+    }
+  }, [editingEvent, fetchEvents]);
+
+  const handleDeleteEvent = useCallback(async (eventId: string) => {
+    if (window.confirm('Are you sure you want to delete this event?')) {
+      try {
+        await eventsService.delete(eventId);
+        await fetchEvents(); // Refresh events after deletion
+      } catch (error) {
+        console.error('Error deleting event:', error);
+      }
+    }
+  }, [fetchEvents]);
+
+  const openEditDialog = (event: Event) => {
+    setEditingEvent(event);
+    setShowEventForm(true);
+  };
+
+  const openCreateDialog = () => {
+    setEditingEvent(null);
+    setShowEventForm(true);
+  };
 
   return (
     <AuthGuard>
@@ -44,7 +77,7 @@ const EventsPage = () => {
               variant="contained"
               color="primary"
               startIcon={<AddIcon />}
-              onClick={() => setShowEventForm(true)}
+              onClick={openCreateDialog}
             >
               Create Event
             </Button>
@@ -61,7 +94,11 @@ const EventsPage = () => {
               <CircularProgress />
             </Box>
           ) : (
-            <EventList events={events} />
+            <EventList
+              events={events}
+              onEdit={openEditDialog}
+              onDelete={handleDeleteEvent}
+            />
           )}
         </Container>
 
@@ -69,7 +106,7 @@ const EventsPage = () => {
           color="primary"
           aria-label="add event"
           sx={{ position: 'fixed', bottom: 32, right: 32 }}
-          onClick={() => setShowEventForm(true)}
+          onClick={openCreateDialog}
         >
           <AddIcon />
         </Fab>
@@ -77,7 +114,9 @@ const EventsPage = () => {
         <EventForm
           open={showEventForm}
           onClose={() => setShowEventForm(false)}
-          onSubmit={handleCreateEvent}
+          onSubmit={editingEvent ? handleEditEvent : handleCreateEvent}
+          isEdit={!!editingEvent}
+          initialData={editingEvent || undefined}
         />
       </MainDashboardLayout>
     </AuthGuard>

@@ -27,9 +27,9 @@ export class CreatePostDto {
   @IsOptional()
   slug?: string;
 
-  @IsEnum(PostStatus)
+  @IsString()
   @IsOptional()
-  status?: PostStatus = PostStatus.DRAFT;
+  status?: string = 'draft';
 
   @IsEnum(PostVisibility)
   @IsOptional()

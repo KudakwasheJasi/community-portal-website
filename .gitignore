@@ -41,6 +41,7 @@ yarn-error.log*
 Backend/node_modules/
 Backend/dist/
 Backend/package-lock.json
+Backend/uploads/
 
 # Client specific
 client/node_modules/

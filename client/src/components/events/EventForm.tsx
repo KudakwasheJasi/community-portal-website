@@ -260,7 +260,7 @@ const EventForm: React.FC<EventFormProps> = ({ open, onClose, onSubmit, isEdit =
           <DialogContent>
             <Box sx={{ pt: 1 }}>
               <Grid container spacing={3}>
-                <Grid size= {{ xs:12, md:4,}} component="div">
+                <Grid size={{xs:12, md:4, }}>
                   <TextField
                     fullWidth
                     label="Event Title"
@@ -271,9 +271,8 @@ const EventForm: React.FC<EventFormProps> = ({ open, onClose, onSubmit, isEdit =
                     required
                   />
                 </Grid>
-                
-          
-                <Grid size= {{ xs:12, md:4}} component="div">
+
+                <Grid size={{xs :12, md:4}}>
                   <TextField
                     fullWidth
                     label="Description"
@@ -286,7 +285,7 @@ const EventForm: React.FC<EventFormProps> = ({ open, onClose, onSubmit, isEdit =
                   />
                 </Grid>
 
-                <Grid size= {{ xs:12, md:3}} component="div">
+                <Grid size={{xs:12, md:4}}>
                   <TextField
                     fullWidth
                     label="Location"
@@ -297,7 +296,7 @@ const EventForm: React.FC<EventFormProps> = ({ open, onClose, onSubmit, isEdit =
                   />
                 </Grid>
 
-                <Grid size= {{ xs:12, sm:4}} component="div">
+                <Grid size={{ xs:12, sm:6, md:3,}}>
                   <TextField
                     fullWidth
                     label="Max Attendees"
@@ -310,25 +309,23 @@ const EventForm: React.FC<EventFormProps> = ({ open, onClose, onSubmit, isEdit =
                   />
                 </Grid>
 
-                <Grid size ={{xs:12, sm:2}} component="div">
-                  <LocalizationProvider dateAdapter={AdapterDateFns}>
-                    <DateTimePicker
-                      label="Start Date & Time"
-                      value={formData.startDate}
-                      onChange={handleDateChange('startDate')}
-                      slotProps={{
-                           textField: {
-                           fullWidth: true,
-                          error: !!formErrors.startDate,
+                <Grid size={{xs:12, sm:6, md:4}}>
+                  <DateTimePicker
+                    label="Start Date & Time"
+                    value={formData.startDate}
+                    onChange={handleDateChange('startDate')}
+                    slotProps={{
+                      textField: {
+                        fullWidth: true,
+                        error: !!formErrors.startDate,
                         helperText: formErrors.startDate,
                         required: true,
-                       },
-                      }}
-                    />
-                  </LocalizationProvider>
+                      },
+                    }}
+                  />
                 </Grid>
 
-                <Grid size = {{ xs:12, sm:6,}} component="div">
+                <Grid size= {{xs:12, sm:6, md:5}}>
                   <DateTimePicker
                     label="End Date & Time"
                     value={formData.endDate}
@@ -343,7 +340,7 @@ const EventForm: React.FC<EventFormProps> = ({ open, onClose, onSubmit, isEdit =
                   />
                 </Grid>
 
-                <Grid size ={{ xs:12, md:4}}>
+                <Grid size={{xs:12, md:6}}>
                   <Box>
                     <Typography variant="subtitle1" gutterBottom>
                       Event Image
@@ -432,7 +429,7 @@ const EventForm: React.FC<EventFormProps> = ({ open, onClose, onSubmit, isEdit =
                   </Box>
                 </Grid>
 
-                <Grid size= {{ xs:12, md:4}}>
+                <Grid size = {{xs:12, md:6}}>
                   <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
                     <Typography variant="subtitle1" gutterBottom>
                       Quick Actions

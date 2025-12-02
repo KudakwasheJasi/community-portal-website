@@ -28,14 +28,16 @@ const PostCard: React.FC<PostCardProps> = ({ data }) => {
         <Stack direction="row" justifyContent="space-between" alignItems="flex-start" mb={1.5}>
           <Stack direction="row" spacing={1.5} alignItems="center">
             <Avatar sx={{ width: 40, height: 40, bgcolor: 'primary.main' }}>
-              {data.author?.username ? data.author.username.charAt(0).toUpperCase() : 'U'}
+              {/* @ts-ignore */}
+              {data.author?.name ? data.author.name.charAt(0).toUpperCase() : 'U'}
             </Avatar>
             <Box>
               <Typography variant="subtitle2" fontWeight={600}>
-                {data.author?.username || 'Unknown Author'}
+                {/* @ts-ignore */}
+                {data.author?.name || 'Unknown Author'}
               </Typography>
               <Typography variant="caption" color="text.secondary">
-                {data.date ? new Date(data.date as string).toLocaleDateString() : 'No date'}
+                {data.createdAt ? new Date(data.createdAt).toLocaleDateString() : 'No date'}
               </Typography>
             </Box>
           </Stack>
@@ -45,7 +47,7 @@ const PostCard: React.FC<PostCardProps> = ({ data }) => {
         </Stack>
 
         <Typography variant="body2" color="text.primary" sx={{ mb: 2, lineHeight: 1.6 }}>
-          {data.description}
+          {data.content || data.description}
         </Typography>
 
         <Stack direction="row" justifyContent="space-between" alignItems="center">

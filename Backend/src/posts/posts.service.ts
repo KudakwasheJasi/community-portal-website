@@ -76,7 +76,7 @@ export class PostsService {
     try {
       const post = await this.postRepository.findOne({
         where: { id },
-        relations: ['author', 'categories', 'tags', 'comments', 'likes'],
+        relations: ['author', 'comments'],
       });
 
       if (!post) {
@@ -96,44 +96,92 @@ export class PostsService {
 
   async create(
     createPostDto: CreatePostDto & { authorId: string },
+    file?: any,
   ): Promise<Post> {
     try {
+      console.log('Creating post with data:', createPostDto);
+      console.log('File:', file);
+
       const { authorId, ...postData } = createPostDto;
+
+      // Generate slug if not provided
+      const slug = postData.slug || this.generateSlug(postData.title);
+      console.log('Generated slug:', slug);
 
       const postDataWithAuthor = {
         ...postData,
+        slug,
         author: { id: authorId },
       };
 
-      if (postData.status && postData.status === PostStatus.PUBLISHED) {
+      // Convert string status to enum
+      if (postData.status) {
+        const statusValue = postData.status.toLowerCase() === 'published' ? PostStatus.PUBLISHED :
+                           postData.status.toLowerCase() === 'draft' ? PostStatus.DRAFT :
+                           postData.status.toLowerCase() === 'archived' ? PostStatus.ARCHIVED :
+                           PostStatus.DRAFT;
+        postDataWithAuthor.status = statusValue;
+      }
+
+      if (postDataWithAuthor.status === PostStatus.PUBLISHED) {
         postDataWithAuthor['publishedAt'] = new Date();
       }
 
-      const post = this.postRepository.create(postDataWithAuthor);
+      // Handle file upload if provided
+      if (file) {
+        postDataWithAuthor['featuredImage'] = `/uploads/${file.filename}`;
+        console.log('Set featuredImage:', postDataWithAuthor['featuredImage']);
+      }
 
-      return await this.postRepository.save(post);
-    } catch {
+      console.log('Final post data:', postDataWithAuthor);
+
+      const post = this.postRepository.create(postDataWithAuthor as Partial<Post>);
+      const savedPost = await this.postRepository.save(post);
+
+      console.log('Post saved successfully:', savedPost.id);
+      return savedPost;
+    } catch (error) {
+      console.error('Error creating post:', error);
       throw new BadRequestException('Failed to create post');
     }
   }
 
-  async update(id: string, updatePostDto: UpdatePostDto): Promise<Post> {
+  private generateSlug(title: string): string {
+    return title
+      .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, '') // Remove special characters
+      .replace(/\s+/g, '-') // Replace spaces with hyphens
+      .replace(/-+/g, '-') // Replace multiple hyphens with single
+      .trim();
+  }
+
+  async update(id: string, updatePostDto: UpdatePostDto, file?: any): Promise<Post> {
     try {
-      const updateData = updatePostDto;
       const post = await this.findOne(id);
 
-      // Create a new object for the updated data with proper typing
-      const updatedData: Partial<Post> = { ...updateData };
+      // Handle file upload if provided
+      if (file) {
+        updatePostDto.featuredImage = `/uploads/${file.filename}`;
+      }
+
+      // Convert string status to enum if provided
+      if (updatePostDto.status) {
+        const statusValue = updatePostDto.status.toLowerCase() === 'published' ? PostStatus.PUBLISHED :
+                           updatePostDto.status.toLowerCase() === 'draft' ? PostStatus.DRAFT :
+                           updatePostDto.status.toLowerCase() === 'archived' ? PostStatus.ARCHIVED :
+                           post.status; // Keep existing status if invalid
+        updatePostDto.status = statusValue;
+      }
 
       // Update status timestamp if status changed to PUBLISHED
       if (
-        updateData.status === PostStatus.PUBLISHED &&
+        updatePostDto.status === PostStatus.PUBLISHED &&
         post.status !== PostStatus.PUBLISHED
       ) {
-        updatedData.publishedAt = new Date();
+        post.publishedAt = new Date();
       }
 
-      Object.assign(post, updatedData);
+      Object.assign(post, updatePostDto);
       return await this.postRepository.save(post);
     } catch (error) {
       if (error instanceof NotFoundException) throw error;

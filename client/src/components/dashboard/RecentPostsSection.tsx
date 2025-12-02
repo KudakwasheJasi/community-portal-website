@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Typography, Stack, Button } from '@mui/material';
-import PostCard from './PostCard';
+import PostCard from '../posts/PostCard';
 import { Post } from '@/services/posts.service';
 
 interface RecentPostsSectionProps {
@@ -14,11 +14,21 @@ const RecentPostsSection: React.FC<RecentPostsSectionProps> = ({ posts }) => {
         <Typography variant="h6">Recent Posts</Typography>
         <Button size="small" sx={{ fontWeight: 600 }}>See All</Button>
       </Stack>
-      <Stack spacing={2}>
+      <Box
+        className="no-scrollbar"
+        sx={{
+          display: 'flex',
+          gap: 2,
+          overflowX: 'auto',
+          pb: 1,
+          mx: -2,
+          px: 2,
+        }}
+      >
         {posts.map((post) => (
-          <PostCard key={post.id} data={post} />
+          <PostCard key={post.id} post={post} />
         ))}
-      </Stack>
+      </Box>
     </Box>
   );
 };

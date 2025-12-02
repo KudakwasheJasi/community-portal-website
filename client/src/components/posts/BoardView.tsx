@@ -1,18 +1,7 @@
-/**
-    * @description      :
-    * @author           : kudakwashe Ellijah
-    * @group            :
-    * @created          : 21/07/2025 - 12:40:20
-    *
-    * MODIFICATION LOG
-    * - Version         : 1.0.0
-    * - Date            : 21/07/2025
-    * - Author          : kudakwashe Ellijah
-    * - Modification    :
-**/
-import React from "react";
-import PostCard from "./PostCard";
-import { Post } from "@/types/post.types";
+import React from 'react';
+import { Grid, Box, Typography } from '@mui/material';
+import PostCard from './PostCard';
+import { Post } from '@/types/post.types';
 
 interface BoardViewProps {
   posts: Post[];
@@ -26,19 +15,23 @@ const BoardView: React.FC<BoardViewProps> = ({ posts, onEdit, onDelete }) => {
 
   if (postsArray.length === 0) {
     return (
-      <div style={{ textAlign: 'center', padding: '64px', border: '2px dashed #ddd' }}>
-        <div style={{ fontSize: '48px', color: '#ccc', marginBottom: '16px' }}>📝</div>
-        <h2>No posts found</h2>
-      </div>
+      <Box textAlign="center" py={8}>
+        <Box sx={{ fontSize: '48px', color: 'grey.400', mb: 2 }}>📝</Box>
+        <Typography variant="h6" color="textSecondary">
+          No posts found
+        </Typography>
+      </Box>
     );
   }
 
   return (
-    <div className='w-full py-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 2xl:gap-10'>
+    <Grid container spacing={3}>
       {postsArray.map((post) => (
-        <PostCard key={post.id} post={post} onEdit={onEdit} onDelete={onDelete} />
+        <Grid size={{ xs: 12, sm: 6, md: 4 }} key={post.id}>
+          <PostCard post={post} onEdit={onEdit} onDelete={onDelete} />
+        </Grid>
       ))}
-    </div>
+    </Grid>
   );
 };
 
