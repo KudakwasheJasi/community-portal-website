@@ -23,7 +23,9 @@ async function bootstrap() {
     'http://localhost:3000',
     'http://localhost:3001',
     'https://community-portal-website.onrender.com',
-    'https://community-portal-website.vercel.app'
+    'https://community-portal-website.vercel.app',
+    'https://community-portal-website-git-main-kudakwashejasis-projects.vercel.app',
+    'https://community-portal-website-91c2egtx2-kudakwashejasis-projects.vercel.app',
   ];
   
   app.enableCors({
