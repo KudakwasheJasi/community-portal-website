@@ -16,7 +16,9 @@ async function bootstrap() {
   const expressApp = app.getHttpAdapter().getInstance();
   expressApp.set('trust proxy', 1);
   expressApp.use(require('body-parser').json({ limit: '10mb' }));
-  expressApp.use(require('body-parser').urlencoded({ limit: '10mb', extended: true }));
+  expressApp.use(
+    require('body-parser').urlencoded({ limit: '10mb', extended: true }),
+  );
 
   // Enable CORS
   const allowedOrigins = [
@@ -29,9 +31,9 @@ async function bootstrap() {
   ];
   
   app.enableCors({
-    origin: true, // Temporarily allow all origins to debug
+    origin: '*', // Allow all origins
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-    credentials: true,
+    credentials: false, // Must be false when using '*'
     allowedHeaders: 'Content-Type,Authorization',
     exposedHeaders: 'Content-Range,X-Content-Range'
   });
