@@ -231,6 +231,3 @@ describe('EventsController', () => {
   });
 });
 
-function expect(remove: (id: string, userId: string) => Promise<void>) {
-    throw new Error('Function not implemented.');
-}
