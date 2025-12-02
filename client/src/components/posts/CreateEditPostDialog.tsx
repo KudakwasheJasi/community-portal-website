@@ -20,7 +20,6 @@ interface PostFormData {
   description: string;
   imageUrl?: string;
   status?: 'published' | 'draft' | 'archived';
-  file?: File;
 }
 
 interface CreateEditPostDialogProps {
@@ -84,7 +83,12 @@ const CreateEditPostDialog: React.FC<CreateEditPostDialogProps> = ({
       setSelectedFile(file);
       const reader = new FileReader();
       reader.onload = (e) => {
-        setImagePreview(e.target?.result as string);
+        const dataUrl = e.target?.result as string;
+        setImagePreview(dataUrl);
+        setFormData(prev => ({
+          ...prev,
+          imageUrl: dataUrl
+        }));
       };
       reader.readAsDataURL(file);
     }
@@ -92,7 +96,7 @@ const CreateEditPostDialog: React.FC<CreateEditPostDialogProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await onSubmit({ ...formData, file: selectedFile || undefined });
+    await onSubmit(formData);
   };
 
   return (

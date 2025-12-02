@@ -26,7 +26,7 @@ interface PostFormData {
   title: string;
   description: string;
   status?: 'published' | 'draft' | 'archived';
-  file?: File;
+  imageUrl?: string;
 }
 
 const PostsPage: React.FC = () => {
@@ -82,13 +82,13 @@ const PostsPageContent: React.FC = () => {
           title: data.title,
           content: data.description,
           status: data.status
-        }, data.file);
+        }, data.imageUrl);
       } else {
         await createPost({
           title: data.title,
           content: data.description,
           status: data.status
-        }, data.file);
+        }, data.imageUrl);
       }
       setDialogOpen(false);
     } catch (err: unknown) {

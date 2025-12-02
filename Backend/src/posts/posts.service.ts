@@ -96,11 +96,9 @@ export class PostsService {
 
   async create(
     createPostDto: CreatePostDto & { authorId: string },
-    file?: any,
   ): Promise<Post> {
     try {
       console.log('Creating post with data:', createPostDto);
-      console.log('File:', file);
 
       const { authorId, ...postData } = createPostDto;
 
@@ -127,12 +125,6 @@ export class PostsService {
         postDataWithAuthor['publishedAt'] = new Date();
       }
 
-      // Handle file upload if provided
-      if (file) {
-        postDataWithAuthor['featuredImage'] = `/uploads/${file.filename}`;
-        console.log('Set featuredImage:', postDataWithAuthor['featuredImage']);
-      }
-
       console.log('Final post data:', postDataWithAuthor);
 
       const post = this.postRepository.create(postDataWithAuthor as Partial<Post>);
@@ -155,14 +147,9 @@ export class PostsService {
       .trim();
   }
 
-  async update(id: string, updatePostDto: UpdatePostDto, file?: any): Promise<Post> {
+  async update(id: string, updatePostDto: UpdatePostDto): Promise<Post> {
     try {
       const post = await this.findOne(id);
-
-      // Handle file upload if provided
-      if (file) {
-        updatePostDto.featuredImage = `/uploads/${file.filename}`;
-      }
 
       // Convert string status to enum if provided
       if (updatePostDto.status) {

@@ -62,22 +62,9 @@ export class PostsController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @UseInterceptors(
-    FileInterceptor('file', {
-      storage: diskStorage({
-        destination: './uploads',
-        filename: (req, file, callback) => {
-          const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-          const extension = extname(file.originalname);
-          callback(null, `${file.fieldname}-${uniqueSuffix}${extension}`);
-        },
-      }),
-    }),
-  )
   @Post()
   async create(
     @Body() createPostDto: CreatePostDto,
-    @UploadedFile() file: any,
     @Request() req: AuthenticatedRequest,
   ) {
     try {
@@ -86,7 +73,6 @@ export class PostsController {
           ...createPostDto,
           authorId: req.user.id,
         },
-        file,
       );
     } catch (error) {
       throw new BadRequestException(
@@ -96,23 +82,10 @@ export class PostsController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @UseInterceptors(
-    FileInterceptor('file', {
-      storage: diskStorage({
-        destination: './uploads',
-        filename: (req, file, callback) => {
-          const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-          const extension = extname(file.originalname);
-          callback(null, `${file.fieldname}-${uniqueSuffix}${extension}`);
-        },
-      }),
-    }),
-  )
   @Put(':id')
   async update(
     @Param('id') id: string,
     @Body() updatePostDto: UpdatePostDto,
-    @UploadedFile() file: any,
     @Request() req: AuthenticatedRequest,
   ) {
     try {
@@ -125,7 +98,7 @@ export class PostsController {
         throw new BadRequestException('Not authorized to update this post');
       }
 
-      return await this.postsService.update(id, updatePostDto, file);
+      return await this.postsService.update(id, updatePostDto);
     } catch (error) {
       if (
         error instanceof NotFoundException ||

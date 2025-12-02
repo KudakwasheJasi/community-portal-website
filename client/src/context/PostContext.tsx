@@ -7,8 +7,8 @@ interface PostContextType {
   loading: boolean;
   error: string | null;
   fetchPosts: () => Promise<void>;
-  createPost: (data: CreatePostData, file?: File) => Promise<Post>;
-  updatePost: (id: string, data: UpdatePostData, file?: File) => Promise<Post>;
+  createPost: (data: CreatePostData, imageUrl?: string) => Promise<Post>;
+  updatePost: (id: string, data: UpdatePostData, imageUrl?: string) => Promise<Post>;
   deletePost: (id: string) => Promise<void>;
   clearError: () => void;
 }
@@ -34,10 +34,10 @@ export const PostProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const createPost = async (data: CreatePostData, file?: File): Promise<Post> => {
+  const createPost = async (data: CreatePostData, imageUrl?: string): Promise<Post> => {
     try {
       setError(null);
-      const newPost = await postsService.create(data, file);
+      const newPost = await postsService.create(data, imageUrl);
       setPosts(prev => [newPost, ...prev]);
       return newPost;
     } catch (err: unknown) {
@@ -47,10 +47,10 @@ export const PostProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const updatePost = async (id: string, data: UpdatePostData, file?: File): Promise<Post> => {
+  const updatePost = async (id: string, data: UpdatePostData, imageUrl?: string): Promise<Post> => {
     try {
       setError(null);
-      const updatedPost = await postsService.update(id, data, file);
+      const updatedPost = await postsService.update(id, data, imageUrl);
       setPosts(prev => prev.map(post => post.id === id ? updatedPost : post));
       return updatedPost;
     } catch (err: unknown) {

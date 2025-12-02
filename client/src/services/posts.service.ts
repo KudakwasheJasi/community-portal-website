@@ -93,33 +93,27 @@ export const postsService = {
     return response.data;
   },
 
-  async create(data: CreatePostData, file?: File): Promise<Post> {
-    const formData = new FormData();
-    formData.append('title', data.title);
-    formData.append('content', data.content);
-    if (data.status) formData.append('status', data.status);
-    if (file) formData.append('file', file);
+  async create(data: CreatePostData, imageUrl?: string): Promise<Post> {
+    const payload = {
+      title: data.title,
+      content: data.content,
+      status: data.status,
+      imageUrl: imageUrl,
+    };
 
-    const response = await api.post('/posts', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
+    const response = await api.post('/posts', payload);
     return response.data;
   },
 
-  async update(id: string, data: UpdatePostData, file?: File): Promise<Post> {
-    const formData = new FormData();
-    formData.append('title', data.title);
-    formData.append('content', data.content);
-    if (data.status) formData.append('status', data.status);
-    if (file) formData.append('file', file);
+  async update(id: string, data: UpdatePostData, imageUrl?: string): Promise<Post> {
+    const payload = {
+      title: data.title,
+      content: data.content,
+      status: data.status,
+      imageUrl: imageUrl,
+    };
 
-    const response = await api.put(`/posts/${id}`, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
+    const response = await api.put(`/posts/${id}`, payload);
     return response.data;
   },
 
