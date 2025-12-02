@@ -47,6 +47,7 @@ const CreateEditPostDialog: React.FC<CreateEditPostDialogProps> = ({
   });
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [imageProcessing, setImageProcessing] = useState(false);
 
   React.useEffect(() => {
     if (initialData) {
@@ -66,6 +67,7 @@ const CreateEditPostDialog: React.FC<CreateEditPostDialogProps> = ({
       });
       setSelectedFile(null);
       setImagePreview(null);
+      setImageProcessing(false);
     }
   }, [initialData, open]);
 
@@ -81,6 +83,7 @@ const CreateEditPostDialog: React.FC<CreateEditPostDialogProps> = ({
     const file = e.target.files?.[0];
     if (file) {
       setSelectedFile(file);
+      setImageProcessing(true);
       const reader = new FileReader();
       reader.onload = (e) => {
         const dataUrl = e.target?.result as string;
@@ -89,6 +92,10 @@ const CreateEditPostDialog: React.FC<CreateEditPostDialogProps> = ({
           ...prev,
           imageUrl: dataUrl
         }));
+        setImageProcessing(false);
+      };
+      reader.onerror = () => {
+        setImageProcessing(false);
       };
       reader.readAsDataURL(file);
     }
@@ -180,13 +187,13 @@ const CreateEditPostDialog: React.FC<CreateEditPostDialogProps> = ({
           <Button onClick={onClose} color="inherit">
             Cancel
           </Button>
-          <Button 
-            type="submit" 
-            variant="contained" 
+          <Button
+            type="submit"
+            variant="contained"
             color="primary"
-            disabled={!formData.title || !formData.description}
+            disabled={!formData.title || !formData.description || imageProcessing}
           >
-            {initialData ? 'Update' : 'Create'} Post
+            {imageProcessing ? 'Processing Image...' : (initialData ? 'Update' : 'Create') + ' Post'}
           </Button>
         </DialogActions>
       </form>
