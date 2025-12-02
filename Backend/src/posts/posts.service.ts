@@ -110,6 +110,7 @@ export class PostsService {
         ...postData,
         slug,
         author: { id: authorId },
+        featuredImage: postData.imageUrl, // Map imageUrl to featuredImage
       };
 
       // Convert string status to enum
@@ -151,24 +152,39 @@ export class PostsService {
     try {
       const post = await this.findOne(id);
 
+      // Prepare update data
+      const updateData: Partial<Post> = {};
+
+      // Map imageUrl to featuredImage if provided
+      if (updatePostDto.imageUrl !== undefined) {
+        updateData.featuredImage = updatePostDto.imageUrl;
+      }
+
       // Convert string status to enum if provided
       if (updatePostDto.status) {
         const statusValue = updatePostDto.status.toLowerCase() === 'published' ? PostStatus.PUBLISHED :
                            updatePostDto.status.toLowerCase() === 'draft' ? PostStatus.DRAFT :
                            updatePostDto.status.toLowerCase() === 'archived' ? PostStatus.ARCHIVED :
                            post.status; // Keep existing status if invalid
-        updatePostDto.status = statusValue;
+        updateData.status = statusValue;
       }
 
       // Update status timestamp if status changed to PUBLISHED
       if (
-        updatePostDto.status === PostStatus.PUBLISHED &&
+        updateData.status === PostStatus.PUBLISHED &&
         post.status !== PostStatus.PUBLISHED
       ) {
         post.publishedAt = new Date();
       }
 
-      Object.assign(post, updatePostDto);
+      // Copy other fields
+      if (updatePostDto.title !== undefined) updateData.title = updatePostDto.title;
+      if (updatePostDto.content !== undefined) updateData.content = updatePostDto.content;
+      if (updatePostDto.excerpt !== undefined) updateData.excerpt = updatePostDto.excerpt;
+      if (updatePostDto.slug !== undefined) updateData.slug = updatePostDto.slug;
+      if (updatePostDto.visibility !== undefined) updateData.visibility = updatePostDto.visibility;
+
+      Object.assign(post, updateData);
       return await this.postRepository.save(post);
     } catch (error) {
       if (error instanceof NotFoundException) throw error;
