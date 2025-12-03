@@ -4,6 +4,8 @@ import MenuIcon from '@mui/icons-material/Menu';
 import SearchIcon from '@mui/icons-material/Search';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import MainNavigationSidebar from '../MainNavigationSidebar';
+import ProfileMenu from '../ProfileMenu';
+import { useAuth } from '@/context/AuthContext';
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -52,9 +54,11 @@ interface DashboardLayoutProps {
 
 const MainDashboardLayout: React.FC<DashboardLayoutProps> = ({ children, title = 'Dashboard' }) => {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [profileMenuAnchor, setProfileMenuAnchor] = useState<null | HTMLElement>(null);
   const [mounted, setMounted] = useState(false);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const { user } = useAuth();
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -63,6 +67,14 @@ const MainDashboardLayout: React.FC<DashboardLayoutProps> = ({ children, title =
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
+  };
+
+  const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setProfileMenuAnchor(event.currentTarget);
+  };
+
+  const handleProfileMenuClose = () => {
+    setProfileMenuAnchor(null);
   };
 
   if (!mounted) {
@@ -93,27 +105,52 @@ const MainDashboardLayout: React.FC<DashboardLayoutProps> = ({ children, title =
           top: 0,
           zIndex: 1100,
         }}>
-          <Search>
-            <SearchIconWrapper>
-              <SearchIcon />
-            </SearchIconWrapper>
-            <StyledInputBase
-              placeholder="Search..."
-              inputProps={{ 'aria-label': 'search' }}
-            />
-          </Search>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            {/* Hamburger menu for mobile */}
+            <IconButton
+              color="inherit"
+              aria-label="open drawer"
+              edge="start"
+              onClick={handleDrawerToggle}
+              sx={{ mr: 2, display: { md: 'none' } }}
+            >
+              <MenuIcon />
+            </IconButton>
+            <Search>
+              <SearchIconWrapper>
+                <SearchIcon />
+              </SearchIconWrapper>
+              <StyledInputBase
+                placeholder="Search..."
+                inputProps={{ 'aria-label': 'search' }}
+              />
+            </Search>
+          </Box>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
             <IconButton color="inherit">
               <Badge badgeContent={2} color="error">
                 <NotificationsIcon />
               </Badge>
             </IconButton>
-            <Avatar sx={{ bgcolor: '#3f51b5', width: 36, height: 36, fontSize: '1rem' }}>K</Avatar>
+            <IconButton onClick={handleProfileMenuOpen} sx={{ p: 0 }}>
+              <Avatar
+                src={user?.avatar}
+                sx={{ bgcolor: '#3f51b5', width: 36, height: 36, fontSize: '1rem' }}
+              >
+                {user?.name?.charAt(0) || 'U'}
+              </Avatar>
+            </IconButton>
           </Box>
         </Box>
         <Box sx={{ p: 3 }}>
           {children}
         </Box>
+
+        <ProfileMenu
+          anchorEl={profileMenuAnchor}
+          open={Boolean(profileMenuAnchor)}
+          onClose={handleProfileMenuClose}
+        />
       </Box>
     </Box>
   );

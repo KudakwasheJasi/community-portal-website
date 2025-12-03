@@ -52,8 +52,9 @@ const EventsPage = () => {
       try {
         await eventsService.delete(eventId);
         await fetchEvents(); // Refresh events after deletion
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error deleting event:', error);
+        alert(`Failed to delete event: ${error.response?.data?.message || error.message || 'Unknown error'}`);
       }
     }
   }, [fetchEvents]);

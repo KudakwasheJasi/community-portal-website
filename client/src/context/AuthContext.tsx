@@ -10,6 +10,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   register: (name: string, email: string, password: string, mobileNumber: string) => Promise<void>;
   logout: () => void;
+  updateProfile: (profileData: Partial<User>) => void;
   isAuthenticated: boolean;
 }
 
@@ -78,12 +79,26 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     router.push('/login');
   };
 
+  const updateProfile = (profileData: Partial<User>) => {
+    if (user) {
+      const updatedUser = { ...user, ...profileData };
+      setUser(updatedUser);
+
+      // Don't store avatar in localStorage to avoid quota exceeded errors
+      const userForStorage = { ...updatedUser };
+      delete userForStorage.avatar;
+
+      localStorage.setItem('user', JSON.stringify(userForStorage));
+    }
+  };
+
   const value = {
     user,
     loading,
     login,
     register,
     logout,
+    updateProfile,
     isAuthenticated: !!user,
   };
 

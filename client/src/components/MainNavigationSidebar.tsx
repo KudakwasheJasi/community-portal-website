@@ -19,7 +19,6 @@ import {
   PostAdd as PostAddIcon,
   Event as EventIcon,
   People as PeopleIcon,
-  Settings as SettingsIcon,
   Logout as LogoutIcon,
   Menu as MenuIcon,
   ChevronLeft as ChevronLeftIcon,
@@ -52,7 +51,6 @@ const Sidebar: React.FC<SidebarProps> = ({ mobileOpen, handleDrawerToggle }) => 
   ];
 
   const bottomMenuItems = [
-    { text: 'Settings', icon: <SettingsIcon />, action: () => router.push('/settings') },
     { text: 'Logout', icon: <LogoutIcon />, action: logout },
   ];
 

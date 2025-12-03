@@ -6,6 +6,7 @@ export interface User {
   email: string;
   mobileNumber: string;
   role?: UserRole;
+  avatar?: string;
   createdAt: string;
   updatedAt: string;
 }

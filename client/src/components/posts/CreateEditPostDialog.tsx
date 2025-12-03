@@ -13,6 +13,7 @@ import {
   Typography
 } from '@mui/material';
 import { Close as CloseIcon, CloudUpload as CloudUploadIcon } from '@mui/icons-material';
+import { uploadFile, validateImage } from '@/utils/fileUpload';
 // PostFormData is defined locally in the posts page
 interface PostFormData {
   id?: string;
@@ -79,25 +80,41 @@ const CreateEditPostDialog: React.FC<CreateEditPostDialogProps> = ({
     }));
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      setSelectedFile(file);
-      setImageProcessing(true);
+    if (!file) return;
+
+    // Validate the image
+    const validation = validateImage(file);
+    if (!validation.valid) {
+      alert(validation.message || 'Invalid image file');
+      return;
+    }
+
+    setSelectedFile(file);
+    setImageProcessing(true);
+
+    try {
+      // Create preview
       const reader = new FileReader();
       reader.onload = (e) => {
         const dataUrl = e.target?.result as string;
         setImagePreview(dataUrl);
-        setFormData(prev => ({
-          ...prev,
-          imageUrl: dataUrl
-        }));
-        setImageProcessing(false);
-      };
-      reader.onerror = () => {
-        setImageProcessing(false);
       };
       reader.readAsDataURL(file);
+
+      // Upload the file
+      const imageUrl = await uploadFile(file);
+
+      setFormData(prev => ({
+        ...prev,
+        imageUrl
+      }));
+    } catch (error) {
+      console.error('Failed to upload image:', error);
+      alert('Failed to upload image. Please try again.');
+    } finally {
+      setImageProcessing(false);
     }
   };
 

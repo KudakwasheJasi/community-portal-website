@@ -252,12 +252,13 @@ export class EventsService {
       user,
     });
 
-    const savedRegistration = await this.registrationRepository.save(registration);
+    const savedRegistration =
+      await this.registrationRepository.save(registration);
 
     // Send email notifications (don't await to avoid blocking)
     try {
       // Send confirmation email to the user
-      this.notificationsService.sendEventRegistrationConfirmation(
+      await this.notificationsService.sendEventRegistrationConfirmation(
         user.email,
         user.firstName + ' ' + user.lastName,
         event.title,
@@ -267,7 +268,7 @@ export class EventsService {
 
       // Send notification email to the organizer
       if (event.organizer && event.organizer.email) {
-        this.notificationsService.sendEventRegistrationNotificationToOrganizer(
+        await this.notificationsService.sendEventRegistrationNotificationToOrganizer(
           event.organizer.email,
           event.organizer.firstName + ' ' + event.organizer.lastName,
           user.firstName + ' ' + user.lastName,

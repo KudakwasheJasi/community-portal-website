@@ -31,6 +31,22 @@ const EventList: React.FC<EventListProps> = ({ events, onEdit, onDelete }) => {
   const { registerForEvent, unregisterFromEvent, loadingStates } = useEvents();
   const { user } = useAuth();
 
+  // Debug logging
+  React.useEffect(() => {
+    console.log('=== EVENT LIST DEBUG ===');
+    console.log('Current user:', user);
+    console.log('Events count:', events.length);
+    events.forEach((event, index) => {
+      console.log(`Event ${index + 1}:`, {
+        id: event.id,
+        title: event.title,
+        organizerId: event.organizerId,
+        userId: user?.id,
+        isOwned: user && event.organizerId && event.organizerId === user.id
+      });
+    });
+  }, [events, user]);
+
   if (events.length === 0) {
     return (
       <Box textAlign="center" py={4}>
@@ -55,7 +71,7 @@ const EventList: React.FC<EventListProps> = ({ events, onEdit, onDelete }) => {
         <Grid size={{ xs: 12, sm: 6, md: 4 }} key={event.id}>
           <Box sx={{ position: 'relative', height: '100%' }}>
             {/* Action buttons - always visible if user owns the event */}
-            {(onEdit || onDelete) && user && event.organizerId === user.id && (
+            {(onEdit || onDelete) && user && event.organizerId && event.organizerId === user.id && (
               <Box
                 sx={{
                   position: 'absolute',

@@ -50,7 +50,10 @@ export class NotificationsService {
       await this.transporter.sendMail(mailOptions);
       console.log(`Event registration confirmation email sent to ${userEmail}`);
     } catch (error) {
-      console.error('Failed to send event registration confirmation email:', error);
+      console.error(
+        'Failed to send event registration confirmation email:',
+        error,
+      );
       // Don't throw error to avoid breaking the registration process
     }
   }
@@ -83,9 +86,14 @@ export class NotificationsService {
       };
 
       await this.transporter.sendMail(mailOptions);
-      console.log(`Event registration notification sent to organizer ${organizerEmail}`);
+      console.log(
+        `Event registration notification sent to organizer ${organizerEmail}`,
+      );
     } catch (error) {
-      console.error('Failed to send event registration notification to organizer:', error);
+      console.error(
+        'Failed to send event registration notification to organizer:',
+        error,
+      );
       // Don't throw error to avoid breaking the registration process
     }
   }

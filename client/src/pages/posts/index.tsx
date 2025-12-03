@@ -48,7 +48,7 @@ const PostsPageContent: React.FC = () => {
     return post ? {
       id: post.id,
       title: post.title,
-      description: post.description || '',
+      description: post.content || '',
       status: post.status.toLowerCase() as 'published' | 'draft' | 'archived'
     } : undefined;
   })() : undefined;

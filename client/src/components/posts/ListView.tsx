@@ -110,16 +110,16 @@ const ListView: React.FC<ListViewProps> = ({ posts, onEdit, onDelete }) => {
                           WebkitBoxOrient: 'vertical',
                           overflow: 'hidden'
                         }}>
-                          {post.description}
+                          {post.content}
                         </div>
                       </div>
                     </div>
                   </TableCell>
                   <TableCell sx={{ py: 1.5 }}>
                     <Chip
-                      label={post.status.charAt(0).toUpperCase() + post.status.slice(1)}
+                      label={post.status ? post.status.charAt(0).toUpperCase() + post.status.slice(1) : 'Draft'}
                       size="small"
-                      color={getStatusColor(post.status)}
+                      color={getStatusColor(post.status || 'draft')}
                       variant="outlined"
                       sx={{
                         textTransform: 'capitalize',
@@ -133,17 +133,17 @@ const ListView: React.FC<ListViewProps> = ({ posts, onEdit, onDelete }) => {
                     <div style={{ display: 'flex', alignItems: 'center' }}>
                       <Avatar
                         src=""
-                        alt={String(post.author || '')}
+                        alt={typeof post.author === 'object' && post.author?.name ? post.author.name : 'Unknown'}
                         sx={{ width: 24, height: 24, mr: 1, fontSize: '0.7rem' }}
                       >
-                        {String(post.author || '').charAt(0).toUpperCase() || 'U'}
+                        {typeof post.author === 'object' && post.author?.name ? post.author.name.charAt(0).toUpperCase() : 'U'}
                       </Avatar>
-                      <span>{String(post.author || '')}</span>
+                      <span>{typeof post.author === 'object' && post.author?.name ? post.author.name : 'Unknown Author'}</span>
                     </div>
                   </TableCell>
                   <TableCell sx={{ py: 1.5 }}>
                     <span style={{ fontSize: '0.875rem', color: 'text.secondary' }}>
-                      {post.date ? new Date(post.date).toLocaleDateString() : 'No date'}
+                      {post.createdAt ? new Date(post.createdAt).toLocaleDateString() : 'No date'}
                     </span>
                   </TableCell>
                   <TableCell sx={{ py: 1.5, textAlign: 'right' }}>

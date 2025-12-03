@@ -8,7 +8,11 @@ import { EventRegistration } from './event-registration.entity';
 import { User } from '../users/user.entity';
 import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
-import { NotFoundException, BadRequestException, ConflictException } from '@nestjs/common';
+import {
+  NotFoundException,
+  BadRequestException,
+  ConflictException,
+} from '@nestjs/common';
 import { NotificationsService } from '../notifications/notifications.service';
 
 describe('EventsService', () => {
@@ -67,7 +71,9 @@ describe('EventsService', () => {
 
     service = module.get<EventsService>(EventsService);
     eventRepository = module.get<Repository<Event>>(getRepositoryToken(Event));
-    registrationRepository = module.get<Repository<EventRegistration>>(getRepositoryToken(EventRegistration));
+    registrationRepository = module.get<Repository<EventRegistration>>(
+      getRepositoryToken(EventRegistration),
+    );
     userRepository = module.get<Repository<User>>(getRepositoryToken(User));
   });
 
