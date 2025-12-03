@@ -12,6 +12,7 @@ import {
   Box,
   Typography,
   Grid,
+  CircularProgress,
 } from '@mui/material';
 import { Close as CloseIcon, CloudUpload as CloudUploadIcon } from '@mui/icons-material';
 import { uploadFile, validateImage } from '@/utils/fileUpload';
@@ -50,6 +51,7 @@ const CreateEditPostDialog: React.FC<CreateEditPostDialogProps> = ({
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageProcessing, setImageProcessing] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   React.useEffect(() => {
     if (initialData) {
@@ -121,7 +123,12 @@ const CreateEditPostDialog: React.FC<CreateEditPostDialogProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await onSubmit(formData);
+    setLoading(true);
+    try {
+      await onSubmit(formData);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -205,9 +212,9 @@ const CreateEditPostDialog: React.FC<CreateEditPostDialogProps> = ({
                       <Image
                         src={imagePreview}
                         alt="Preview"
-                        width={400}
-                        height={200}
-                        style={{ maxWidth: '100%', maxHeight: '200px', objectFit: 'cover' }}
+                        width={200}
+                        height={120}
+                        style={{ maxWidth: '100%', maxHeight: '120px', objectFit: 'cover', borderRadius: '4px' }}
                       />
                     </Box>
                   )}
@@ -224,9 +231,10 @@ const CreateEditPostDialog: React.FC<CreateEditPostDialogProps> = ({
             type="submit"
             variant="contained"
             color="primary"
-            disabled={!formData.title || !formData.description || imageProcessing}
+            disabled={loading || !formData.title || !formData.description || imageProcessing}
+            startIcon={loading ? <CircularProgress size={20} /> : null}
           >
-            {imageProcessing ? 'Processing Image...' : (initialData ? 'Update' : 'Create') + ' Post'}
+            {loading ? 'Creating...' : imageProcessing ? 'Processing Image...' : (initialData ? 'Update' : 'Create') + ' Post'}
           </Button>
         </DialogActions>
       </form>
