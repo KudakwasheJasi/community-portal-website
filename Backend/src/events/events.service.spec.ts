@@ -9,6 +9,7 @@ import { User } from '../users/user.entity';
 import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
 import { NotFoundException, BadRequestException, ConflictException } from '@nestjs/common';
+import { NotificationsService } from '../notifications/notifications.service';
 
 describe('EventsService', () => {
   let service: EventsService;
@@ -36,6 +37,11 @@ describe('EventsService', () => {
     findOne: jest.fn(),
   };
 
+  const mockNotificationsService = {
+    sendEventRegistrationConfirmation: jest.fn(),
+    sendEventRegistrationNotificationToOrganizer: jest.fn(),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -51,6 +57,10 @@ describe('EventsService', () => {
         {
           provide: getRepositoryToken(User),
           useValue: mockUserRepository,
+        },
+        {
+          provide: NotificationsService,
+          useValue: mockNotificationsService,
         },
       ],
     }).compile();
