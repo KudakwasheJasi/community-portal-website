@@ -9,8 +9,8 @@ services:
       - key: NODE_ENV
         value: production
       - key: DATABASE_URL
-        value: YOUR_DATABASE_URL_HERE
+        value: postgresql://community_portal_db_user:NBgonPGarFY3NLlC55qpHv61ZB9SMPuc@dpg-d4mgvohr0fns73a651q0-a.oregon-postgres.render.com/community_portal_db
       - key: JWT_SECRET
         generateValue: true
       - key: FRONTEND_URL
-        value: https://client-9anhkhan8-kudakwashejasis-projects.vercel.app
+        value: https://community-portal-website.vercel.app
