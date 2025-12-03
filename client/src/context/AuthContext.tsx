@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import { useRouter } from 'next/router';
 import authService from '@/services/auth.service';
 import { User, AuthResponse } from '@/types/auth';
+import { NotificationSounds } from '@/utils/notificationSounds';
 
 interface AuthContextType {
   user: User | null;
@@ -44,6 +45,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       const data = await authService.login({ email, password });
       handleAuthResponse(data);
+      // Play login success sound
+      NotificationSounds.playLogin();
       router.push('/dashboard');
     } catch (error) {
       console.error('Login failed:', error);

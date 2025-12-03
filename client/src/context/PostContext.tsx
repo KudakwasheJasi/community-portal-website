@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import postsService, { CreatePostData, UpdatePostData } from '@/services/posts.service';
 import { Post } from '@/types/post.types';
+import { NotificationSounds } from '@/utils/notificationSounds';
 
 interface PostContextType {
   posts: Post[];
@@ -39,6 +40,8 @@ export const PostProvider = ({ children }: { children: ReactNode }) => {
       setError(null);
       const newPost = await postsService.create(data, imageUrl);
       setPosts(prev => [newPost, ...prev]);
+      // Play success sound for post creation
+      NotificationSounds.playCreation();
       return newPost;
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to create post';

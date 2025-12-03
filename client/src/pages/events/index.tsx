@@ -17,6 +17,7 @@ import EventList from '@/components/events/EventList';
 import EventForm from '@/components/events/EventForm';
 import { useEvents } from '@/context/EventContext';
 import eventsService, { CreateEventData, Event } from '@/services/events.service';
+import { NotificationSounds } from '@/utils/notificationSounds';
 
 const EventsPage = () => {
   const router = useRouter();
@@ -28,6 +29,8 @@ const EventsPage = () => {
     try {
       await eventsService.create(eventData);
       await fetchEvents(); // Refresh events after creation
+      // Play success sound for event creation
+      NotificationSounds.playCreation();
     } catch (error) {
       console.error('Error creating event:', error);
     }

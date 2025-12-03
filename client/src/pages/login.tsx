@@ -19,6 +19,7 @@ import Head from 'next/head';
 import { styled } from '@mui/system';
 import NextLink from 'next/link';
 import { useAuth } from '@/context/AuthContext';
+import { NotificationSounds } from '@/utils/notificationSounds';
 
 interface FormData {
   email: string;
