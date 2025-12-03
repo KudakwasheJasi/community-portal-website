@@ -77,17 +77,19 @@ const Sidebar: React.FC<SidebarProps> = ({ mobileOpen, handleDrawerToggle }) => 
             Community Portal
           </Typography>
         )}
-        <IconButton
-          onClick={() => setCollapsed(!collapsed)}
-          sx={{
-            color: theme.palette.primary.main,
-            '&:hover': {
-              backgroundColor: theme.palette.action.hover,
-            },
-          }}
-        >
-          {collapsed ? <ChevronRightIcon /> : <ChevronLeftIcon />}
-        </IconButton>
+        {!isMobile && (
+          <IconButton
+            onClick={() => setCollapsed(!collapsed)}
+            sx={{
+              color: theme.palette.primary.main,
+              '&:hover': {
+                backgroundColor: theme.palette.action.hover,
+              },
+            }}
+          >
+            {collapsed ? <ChevronRightIcon /> : <ChevronLeftIcon />}
+          </IconButton>
+        )}
       </Box>
       
       <Divider />
@@ -193,7 +195,7 @@ const Sidebar: React.FC<SidebarProps> = ({ mobileOpen, handleDrawerToggle }) => 
         }}
         sx={{
           display: { xs: 'block', md: 'none' },
-          '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
+          '& .MuiDrawer-paper': { boxSizing: 'border-box', width: { xs: '100%', sm: drawerWidth } },
         }}
       >
         {drawer}

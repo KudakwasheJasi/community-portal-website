@@ -9,11 +9,11 @@ import {
   Link,
   Paper,
   Container,
-  Alert,
 } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import NextLink from 'next/link';
 import { useAuth } from '@/context/AuthContext';
+import { toast } from 'sonner';
 
 export default function RegisterPage() {
   const [form, setForm] = useState({
@@ -63,8 +63,9 @@ export default function RegisterPage() {
       setRegisterError('');
       try {
         await register(form.name, form.email, form.password, form.mobile);
+        toast.success('Registration successful! Please login to continue.');
       } catch (err: unknown) {
-        setRegisterError(err instanceof Error ? err.message : 'Registration failed');
+        toast.error(err instanceof Error ? err.message : 'Registration failed. Please try again.');
       } finally {
         setLoading(false);
       }
@@ -90,11 +91,6 @@ export default function RegisterPage() {
           Join our community today!
         </Typography>
 
-        {registerError && (
-          <Alert severity="error" sx={{ mb: 3 }}>
-            {registerError}
-          </Alert>
-        )}
 
         <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2, '& .MuiTextField-root': { mb: 1.5 } }}>
           <TextField

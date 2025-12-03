@@ -1,12 +1,52 @@
 // client/src/utils/notificationSounds.ts
 export class NotificationSounds {
   private static audioContext: AudioContext | null = null;
+  private static notificationAudio: HTMLAudioElement | null = null;
 
-  // Create a simple beep sound using Web Audio API
+  // Initialize the notification audio
+  private static initNotificationAudio(): void {
+    if (!this.notificationAudio) {
+      this.notificationAudio = new Audio('/mixkit-happy-bells-notification-937.wav');
+      this.notificationAudio.volume = 0.5; // Set volume to 50%
+      this.notificationAudio.preload = 'auto'; // Preload the audio
+    }
+  }
+
+  // Play the notification sound
+  private static playNotificationSound(): Promise<void> {
+    return new Promise((resolve) => {
+      try {
+        this.initNotificationAudio();
+        if (this.notificationAudio) {
+          this.notificationAudio.currentTime = 0; // Reset to start
+          this.notificationAudio.volume = 1.0; // Full volume
+          this.notificationAudio.play().then(() => {
+            // Wait for the sound to end
+            this.notificationAudio!.addEventListener('ended', () => {
+              resolve();
+            }, { once: true });
+          }).catch(error => {
+            console.warn('Failed to play notification sound:', error);
+            this.fallbackBeep();
+            resolve(); // Resolve even on error
+          });
+        } else {
+          this.fallbackBeep();
+          resolve();
+        }
+      } catch (error) {
+        console.warn('Audio playback not supported, using fallback');
+        this.fallbackBeep();
+        resolve();
+      }
+    });
+  }
+
+  // Create a simple beep sound using Web Audio API (fallback)
   private static createBeep(frequency: number = 800, duration: number = 200, type: OscillatorType = 'sine'): void {
     try {
       if (!this.audioContext) {
-        this.audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+        this.audioContext = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
       }
 
       const oscillator = this.audioContext.createOscillator();
@@ -36,24 +76,22 @@ export class NotificationSounds {
   }
 
   // Play success sound (higher pitch, pleasant)
-  static playSuccess(): void {
-    this.createBeep(800, 150, 'sine');
+  static async playSuccess(): Promise<void> {
+    await this.playNotificationSound();
   }
 
   // Play login sound (medium pitch)
-  static playLogin(): void {
-    this.createBeep(600, 200, 'triangle');
+  static async playLogin(): Promise<void> {
+    await this.playNotificationSound();
   }
 
   // Play creation sound (ascending tones)
-  static playCreation(): void {
-    setTimeout(() => this.createBeep(500, 100), 0);
-    setTimeout(() => this.createBeep(600, 100), 100);
-    setTimeout(() => this.createBeep(700, 150), 200);
+  static async playCreation(): Promise<void> {
+    await this.playNotificationSound();
   }
 
   // Play error sound (lower pitch, longer)
-  static playError(): void {
-    this.createBeep(300, 300, 'sawtooth');
+  static async playError(): Promise<void> {
+    await this.playNotificationSound();
   }
 }

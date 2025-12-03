@@ -69,15 +69,13 @@ const PostCard: React.FC<PostCardProps> = ({ post, onEdit, onDelete }) => {
   return (
     <Card
       sx={{
-        minWidth: 320,
-        maxWidth: 320,
+        width: '100%',
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
         cursor: 'pointer',
         transition: 'box-shadow 0.2s',
         '&:hover': { boxShadow: 4 },
-        flexShrink: 0,
       }}
     >
       <Box

@@ -15,7 +15,7 @@ import { ColorModeProvider } from '@/theme/ThemeProvider';
 
 // Dynamically import components that shouldn't be server-side rendered
 const Toaster = dynamic(
-  () => import('react-hot-toast').then((c) => c.Toaster),
+  () => import('sonner').then((c) => c.Toaster),
   { ssr: false }
 );
 

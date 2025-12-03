@@ -51,7 +51,7 @@ export class Event {
   @Column({ nullable: true })
   imageUrl: string;
 
-  @Column({ type: 'uuid' })
+  @Column({ type: 'uuid', nullable: true })
   organizerId: string;
 
   @ManyToOne(() => User, { eager: true })

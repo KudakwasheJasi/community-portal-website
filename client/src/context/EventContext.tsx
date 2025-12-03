@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import eventsService, { Event, EventRegistration } from '@/services/events.service';
+import { useAuth } from '@/context/AuthContext';
 
 interface EventContextType {
   events: Event[];
@@ -15,18 +16,24 @@ interface EventContextType {
 const EventContext = createContext<EventContextType | undefined>(undefined);
 
 export const EventProvider = ({ children }: { children: ReactNode }) => {
+  const { user, isAuthenticated } = useAuth();
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loadingStates, setLoadingStates] = useState<Record<string, 'registering' | 'unregistering' | null>>({});
 
   const fetchEvents = async () => {
+    if (!isAuthenticated || !user) {
+      setEvents([]);
+      setError(null);
+      return;
+    }
+
     try {
       setLoading(true);
       setError(null);
       console.log('Fetching events...');
 
-      // Always fetch events (doesn't require auth)
       const fetchedEvents = await eventsService.getAll();
       console.log('Fetched events:', fetchedEvents);
 
@@ -64,6 +71,10 @@ export const EventProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const registerForEvent = async (id: string) => {
+    if (!isAuthenticated || !user) {
+      return { success: false, message: 'Please log in to register for events' };
+    }
+
     try {
       setLoadingStates(prev => ({ ...prev, [id]: 'registering' }));
       
@@ -101,6 +112,10 @@ export const EventProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const unregisterFromEvent = async (id: string) => {
+    if (!isAuthenticated || !user) {
+      return { success: false, message: 'Please log in to unregister from events' };
+    }
+
     try {
       setLoadingStates(prev => ({ ...prev, [id]: 'unregistering' }));
       
@@ -140,8 +155,14 @@ export const EventProvider = ({ children }: { children: ReactNode }) => {
   const clearError = () => setError(null);
 
   useEffect(() => {
-    fetchEvents();
-  }, []);
+    if (isAuthenticated && user) {
+      fetchEvents();
+    } else {
+      // Clear events when not authenticated
+      setEvents([]);
+      setError(null);
+    }
+  }, [isAuthenticated, user]);
 
   const value = {
     events,

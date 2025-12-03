@@ -216,6 +216,13 @@ const ProfileMenu: React.FC<ProfileMenuProps> = ({ anchorEl, open, onClose }) =>
         onClose={() => setProfileDialogOpen(false)}
         maxWidth="sm"
         fullWidth
+        BackdropProps={{ style: { backdropFilter: 'blur(8px)' } }}
+        sx={{
+          '& .MuiDialog-paper': {
+            borderRadius: 3,
+            boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
+          }
+        }}
       >
         <DialogTitle>
           <Box display="flex" justifyContent="space-between" alignItems="center">
@@ -329,6 +336,13 @@ const ProfileMenu: React.FC<ProfileMenuProps> = ({ anchorEl, open, onClose }) =>
         onClose={() => setPasswordDialogOpen(false)}
         maxWidth="sm"
         fullWidth
+        BackdropProps={{ style: { backdropFilter: 'blur(8px)' } }}
+        sx={{
+          '& .MuiDialog-paper': {
+            borderRadius: 3,
+            boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
+          }
+        }}
       >
         <DialogTitle>
           <Box display="flex" justifyContent="space-between" alignItems="center">

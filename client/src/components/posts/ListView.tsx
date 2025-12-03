@@ -62,8 +62,8 @@ const ListView: React.FC<ListViewProps> = ({ posts, onEdit, onDelete }) => {
             <TableRow sx={{ bgcolor: 'action.hover' }}>
               <TableCell sx={{ fontWeight: 600, py: 1.5 }}>Title</TableCell>
               <TableCell sx={{ fontWeight: 600, py: 1.5 }}>Status</TableCell>
-              <TableCell sx={{ fontWeight: 600, py: 1.5 }}>Author</TableCell>
-              <TableCell sx={{ fontWeight: 600, py: 1.5 }}>Date</TableCell>
+              <TableCell sx={{ fontWeight: 600, py: 1.5, display: { xs: 'none', sm: 'table-cell' } }}>Author</TableCell>
+              <TableCell sx={{ fontWeight: 600, py: 1.5, display: { xs: 'none', sm: 'table-cell' } }}>Date</TableCell>
               <TableCell sx={{ fontWeight: 600, py: 1.5, textAlign: 'right' }}>Actions</TableCell>
             </TableRow>
           </TableHead>
@@ -129,7 +129,7 @@ const ListView: React.FC<ListViewProps> = ({ posts, onEdit, onDelete }) => {
                       }}
                     />
                   </TableCell>
-                  <TableCell sx={{ py: 1.5 }}>
+                  <TableCell sx={{ py: 1.5, display: { xs: 'none', sm: 'table-cell' } }}>
                     <div style={{ display: 'flex', alignItems: 'center' }}>
                       <Avatar
                         src=""
@@ -141,7 +141,7 @@ const ListView: React.FC<ListViewProps> = ({ posts, onEdit, onDelete }) => {
                       <span>{typeof post.author === 'object' && post.author?.name ? post.author.name : 'Unknown Author'}</span>
                     </div>
                   </TableCell>
-                  <TableCell sx={{ py: 1.5 }}>
+                  <TableCell sx={{ py: 1.5, display: { xs: 'none', sm: 'table-cell' } }}>
                     <span style={{ fontSize: '0.875rem', color: 'text.secondary' }}>
                       {post.createdAt ? new Date(post.createdAt).toLocaleDateString() : 'No date'}
                     </span>

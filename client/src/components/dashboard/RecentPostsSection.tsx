@@ -26,7 +26,9 @@ const RecentPostsSection: React.FC<RecentPostsSectionProps> = ({ posts }) => {
         }}
       >
         {posts.map((post) => (
-          <PostCard key={post.id} post={post} />
+          <Box key={post.id} sx={{ minWidth: 300, maxWidth: 300, flexShrink: 0 }}>
+            <PostCard post={post} />
+          </Box>
         ))}
       </Box>
     </Box>

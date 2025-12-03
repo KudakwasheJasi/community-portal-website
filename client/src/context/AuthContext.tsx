@@ -46,8 +46,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       const data = await authService.login({ email, password });
       handleAuthResponse(data);
-      // Play login success sound
-      NotificationSounds.playLogin();
+      // Play login success sound and wait for it to finish
+      await NotificationSounds.playLogin();
       router.push('/dashboard');
     } catch (error) {
       console.error('Login failed:', error);

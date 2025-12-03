@@ -35,9 +35,12 @@ export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 
   @Get()
-  async findAll(@Query() query: PostQueryDto) {
+  @UseGuards(JwtAuthGuard)
+  async findAll(@Query() query: PostQueryDto, @Request() req: AuthenticatedRequest) {
     try {
-      return await this.postsService.findAll(query);
+      // Automatically filter posts by current user
+      const userQuery = { ...query, authorId: req.user.id };
+      return await this.postsService.findAll(userQuery);
     } catch (error) {
       throw new BadRequestException(
         error instanceof Error ? error.message : 'Failed to fetch posts',

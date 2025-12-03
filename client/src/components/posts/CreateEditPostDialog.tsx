@@ -10,7 +10,8 @@ import {
   IconButton,
   Stack,
   Box,
-  Typography
+  Typography,
+  Grid,
 } from '@mui/material';
 import { Close as CloseIcon, CloudUpload as CloudUploadIcon } from '@mui/icons-material';
 import { uploadFile, validateImage } from '@/utils/fileUpload';
@@ -124,11 +125,18 @@ const CreateEditPostDialog: React.FC<CreateEditPostDialogProps> = ({
   };
 
   return (
-    <Dialog 
-      open={open} 
+    <Dialog
+      open={open}
       onClose={onClose}
       maxWidth="sm"
       fullWidth
+      BackdropProps={{ style: { backdropFilter: 'blur(8px)' } }}
+      sx={{
+        '& .MuiDialog-paper': {
+          borderRadius: 3,
+          boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
+        }
+      }}
     >
       <form onSubmit={handleSubmit}>
         <DialogTitle>
@@ -140,65 +148,73 @@ const CreateEditPostDialog: React.FC<CreateEditPostDialogProps> = ({
           </Box>
         </DialogTitle>
         <DialogContent dividers>
-          <Stack spacing={3} sx={{ pt: 1 }}>
-            <TextField
-              name="title"
-              label="Title"
-              value={formData.title}
-              onChange={handleChange}
-              fullWidth
-              required
-              margin="normal"
-              variant="outlined"
-            />
-            <TextField
-              name="description"
-              label="Description"
-              value={formData.description}
-              onChange={handleChange}
-              fullWidth
-              required
-              multiline
-              rows={4}
-              margin="normal"
-              variant="outlined"
-            />
-            <Box>
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                Image (optional)
-              </Typography>
-              <Button
-                variant="outlined"
-                component="label"
-                startIcon={<CloudUploadIcon />}
-                sx={{ mb: 2 }}
-              >
-                Choose Image
-                <input
-                  type="file"
-                  hidden
-                  accept="image/*"
-                  onChange={handleFileChange}
+          <Box sx={{ pt: 1 }}>
+            <Grid container spacing={3}>
+              <Grid size={{xs:12, sm:6}}>
+                <TextField
+                  name="title"
+                  label="Title"
+                  value={formData.title}
+                  onChange={handleChange}
+                  fullWidth
+                  required
+                  margin="normal"
+                  variant="outlined"
                 />
-              </Button>
-              {selectedFile && (
-                <Typography variant="body2" color="text.secondary">
-                  Selected: {selectedFile.name}
-                </Typography>
-              )}
-              {imagePreview && (
-                <Box sx={{ mt: 2 }}>
-                  <Image
-                    src={imagePreview}
-                    alt="Preview"
-                    width={400}
-                    height={200}
-                    style={{ maxWidth: '100%', maxHeight: '200px', objectFit: 'cover' }}
-                  />
+              </Grid>
+              <Grid size={{xs:12, sm:6}}>
+                <TextField
+                  name="description"
+                  label="Description"
+                  value={formData.description}
+                  onChange={handleChange}
+                  fullWidth
+                  required
+                  multiline
+                  rows={4}
+                  margin="normal"
+                  variant="outlined"
+                />
+              </Grid>
+              <Grid size={{xs:12}}>
+                <Box>
+                  <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                    Image (optional)
+                  </Typography>
+                  <Button
+                    variant="outlined"
+                    component="label"
+                    startIcon={<CloudUploadIcon />}
+                    sx={{ mb: 2 }}
+                  >
+                    Choose Image
+                    <input
+                      type="file"
+                      hidden
+                      accept="image/*"
+                      onChange={handleFileChange}
+                    />
+                  </Button>
+                  {selectedFile && (
+                    <Typography variant="body2" color="text.secondary">
+                      Selected: {selectedFile.name}
+                    </Typography>
+                  )}
+                  {imagePreview && (
+                    <Box sx={{ mt: 2 }}>
+                      <Image
+                        src={imagePreview}
+                        alt="Preview"
+                        width={400}
+                        height={200}
+                        style={{ maxWidth: '100%', maxHeight: '200px', objectFit: 'cover' }}
+                      />
+                    </Box>
+                  )}
                 </Box>
-              )}
-            </Box>
-          </Stack>
+              </Grid>
+            </Grid>
+          </Box>
         </DialogContent>
         <DialogActions sx={{ p: 2 }}>
           <Button onClick={onClose} color="inherit">

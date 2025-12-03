@@ -26,7 +26,9 @@ const UpcomingEventsSection: React.FC<UpcomingEventsSectionProps> = ({ events })
         }}
       >
         {events.map((event) => (
-          <EventCard key={event.id} data={event} />
+          <Box key={event.id} sx={{ minWidth: 280, maxWidth: 280, flexShrink: 0 }}>
+            <EventCard data={event} />
+          </Box>
         ))}
       </Box>
     </Box>

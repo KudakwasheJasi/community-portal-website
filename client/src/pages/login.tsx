@@ -9,10 +9,9 @@ import {
   Link,
   Paper,
   Container,
-  Alert,
   Slide,
   useTheme,
-  useMediaQuery,
+  Grid,
 } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import Head from 'next/head';
@@ -20,10 +19,12 @@ import { styled } from '@mui/system';
 import NextLink from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 import { NotificationSounds } from '@/utils/notificationSounds';
+import { toast } from 'sonner';
 
 interface FormData {
   email: string;
   password: string;
+  confirmPassword: string;
 }
 
 const GradientBackground = styled(Box)({
@@ -62,17 +63,9 @@ const LoginForm = styled(Paper)(({ theme }) => ({
   margin: '0 auto',
   [theme.breakpoints.down('sm')]: {
     padding: '2rem 1.5rem',
-    borderRadius: '16px 16px 0 0',
-    position: 'fixed',
-    bottom: 0,
-    left: 0,
-    right: 0,
+    borderRadius: '16px',
     maxWidth: '100%',
-    animation: 'slideUp 0.5s ease-out',
-  },
-  '@keyframes slideUp': {
-    from: { transform: 'translateY(100%)' },
-    to: { transform: 'translateY(0)' },
+    margin: '1rem',
   },
 }));
 
@@ -81,14 +74,15 @@ const Login: React.FC = () => {
   const [formData, setFormData] = useState<FormData>({
     email: '',
     password: '',
+    confirmPassword: '',
   });
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [errors, setErrors] = useState<Partial<FormData>>({});
   const [loginError, setLoginError] = useState('');
   const [loading, setLoading] = useState(false);
   const [mounted, setMounted] = useState(false);
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   useEffect(() => {
     setMounted(true);
@@ -104,13 +98,16 @@ const Login: React.FC = () => {
   };
 
   const togglePasswordVisibility = () => setShowPassword(!showPassword);
+  const toggleConfirmPasswordVisibility = () => setShowConfirmPassword(!showConfirmPassword);
 
   const validate = (): boolean => {
     const newErrors: Partial<FormData> = {};
     if (!formData.email) newErrors.email = 'Email is required';
     else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = 'Email is invalid';
     if (!formData.password) newErrors.password = 'Password is required';
-    
+    if (!formData.confirmPassword) newErrors.confirmPassword = 'Confirm Password is required';
+    else if (formData.password !== formData.confirmPassword) newErrors.confirmPassword = 'Passwords do not match';
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -122,8 +119,9 @@ const Login: React.FC = () => {
       setLoginError('');
       try {
         await login(formData.email, formData.password);
+        toast.success('Login successful!');
       } catch (err: unknown) {
-        setLoginError(err instanceof Error ? err.message : 'Login failed');
+        toast.error(err instanceof Error ? err.message : 'Login failed');
       } finally {
         setLoading(false);
       }
@@ -139,55 +137,81 @@ const Login: React.FC = () => {
         Log in to manage your community.
       </Typography>
       
-      {loginError && (
-        <Alert severity="error" sx={{ mb: 3 }}>
-          {loginError}
-        </Alert>
-      )}
       
       <Box component="form" onSubmit={handleSubmit} sx={{ width: '100%' }}>
-        <TextField
-          margin="normal"
-          required
-          fullWidth
-          id="email"
-          label="Email Address"
-          name="email"
-          autoComplete="email"
-          autoFocus
-          value={formData.email}
-          onChange={handleChange}
-          error={!!errors.email}
-          helperText={errors.email}
-          sx={{ mb: 2 }}
-        />
-        <TextField
-          margin="normal"
-          required
-          fullWidth
-          name="password"
-          label="Password"
-          type={showPassword ? 'text' : 'password'}
-          id="password"
-          autoComplete="current-password"
-          value={formData.password}
-          onChange={handleChange}
-          error={!!errors.password}
-          helperText={errors.password}
-          InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">
-                <IconButton
-                  aria-label="toggle password visibility"
-                  onClick={togglePasswordVisibility}
-                  edge="end"
-                >
-                  {showPassword ? <VisibilityOff /> : <Visibility />}
-                </IconButton>
-              </InputAdornment>
-            ),
-          }}
-        />
+        <Grid container spacing={2}>
+          <Grid size={{ xs: 12 }}>
+            <TextField
+              required
+              fullWidth
+              id="email"
+              label="Email Address"
+              name="email"
+              autoComplete="email"
+              autoFocus
+              value={formData.email}
+              onChange={handleChange}
+              error={!!errors.email}
+              helperText={errors.email}
+            />
+          </Grid>
+          <Grid size={{ xs: 12, sm: 6 }}>
+            <TextField
+              required
+              fullWidth
+              name="password"
+              label="Password"
+              type={showPassword ? 'text' : 'password'}
+              id="password"
+              autoComplete="current-password"
+              value={formData.password}
+              onChange={handleChange}
+              error={!!errors.password}
+              helperText={errors.password}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label="toggle password visibility"
+                      onClick={togglePasswordVisibility}
+                      edge="end"
+                    >
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </Grid>
+          <Grid size={{ xs: 12, sm: 6 }}>
+            <TextField
+              required
+              fullWidth
+              name="confirmPassword"
+              label="Confirm Password"
+              type={showConfirmPassword ? 'text' : 'password'}
+              id="confirmPassword"
+              autoComplete="new-password"
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              error={!!errors.confirmPassword}
+              helperText={errors.confirmPassword}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label="toggle confirm password visibility"
+                      onClick={toggleConfirmPasswordVisibility}
+                      edge="end"
+                    >
+                      {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </Grid>
+        </Grid>
         <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1, mb: 2 }}>
           <Link component={NextLink} href="/forgot-password" variant="body2" color="primary">
             Forgot password?
@@ -222,32 +246,20 @@ const Login: React.FC = () => {
         <meta name="description" content="Login to your Community Portal account" />
       </Head>
       <GradientBackground>
-        <Container 
-          maxWidth="sm" 
-          sx={{ 
+        <Container
+          maxWidth="sm"
+          sx={{
             position: 'relative',
-            height: isMobile ? 'auto' : '100vh',
+            height: '100vh',
             display: 'flex',
             alignItems: 'center'
           }}
         >
-          {isMobile ? (
-            <LoginForm elevation={3} sx={{ 
-              animation: mounted ? 'slideUp 0.5s ease-out' : 'none',
-              '@keyframes slideUp': {
-                from: { transform: 'translateY(100%)' },
-                to: { transform: 'translateY(0)' },
-              }
-            }}>
+          <Slide direction="up" in={mounted} mountOnEnter unmountOnExit>
+            <LoginForm elevation={3}>
               {formContent}
             </LoginForm>
-          ) : (
-            <Slide direction="left" in={mounted} mountOnEnter unmountOnExit>
-              <LoginForm elevation={3}>
-                {formContent}
-              </LoginForm>
-            </Slide>
-          )}
+          </Slide>
         </Container>
       </GradientBackground>
     </>

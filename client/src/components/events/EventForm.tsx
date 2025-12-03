@@ -240,7 +240,22 @@ const EventForm: React.FC<EventFormProps> = ({ open, onClose, onSubmit, isEdit =
 
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
-      <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth scroll="body" sx={{ '& .MuiDialog-paper': { maxHeight: '90vh', overflowY: 'auto' } }}>
+      <Dialog
+        open={open}
+        onClose={handleClose}
+        maxWidth="sm"
+        fullWidth
+        scroll="body"
+        BackdropProps={{ style: { backdropFilter: 'blur(8px)' } }}
+        sx={{
+          '& .MuiDialog-paper': {
+            maxHeight: '90vh',
+            overflowY: 'auto',
+            borderRadius: 3,
+            boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
+          }
+        }}
+      >
         <form onSubmit={handleSubmit}>
           <DialogTitle>{isEdit ? 'Edit Event' : 'Create New Event'}</DialogTitle>
           <DialogActions sx={{ px: 3, pt: 1, pb: 0, justifyContent: 'flex-start' }}>
@@ -321,6 +336,15 @@ const EventForm: React.FC<EventFormProps> = ({ open, onClose, onSubmit, isEdit =
                         helperText: formErrors.startDate,
                         required: true,
                       },
+                      popper: {
+                        sx: {
+                          '& .MuiPaper-root': {
+                            maxWidth: '280px',
+                            maxHeight: '350px',
+                            overflow: 'auto',
+                          },
+                        },
+                      },
                     }}
                   />
                 </Grid>
@@ -335,6 +359,15 @@ const EventForm: React.FC<EventFormProps> = ({ open, onClose, onSubmit, isEdit =
                         fullWidth: true,
                         error: !!formErrors.endDate,
                         helperText: formErrors.endDate,
+                      },
+                      popper: {
+                        sx: {
+                          '& .MuiPaper-root': {
+                            maxWidth: '280px',
+                            maxHeight: '350px',
+                            overflow: 'auto',
+                          },
+                        },
                       },
                     }}
                   />

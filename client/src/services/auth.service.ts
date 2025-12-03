@@ -60,6 +60,11 @@ export const authService = {
     return response.data;
   },
 
+  async forgotPassword(email: string): Promise<{ message: string }> {
+    const response = await api.post('/auth/forgot-password', { email });
+    return response.data;
+  },
+
   getCurrentUser(): User | null {
     const user = localStorage.getItem('user');
     return user ? JSON.parse(user) : null;

@@ -16,20 +16,22 @@ import { EventsService } from './events.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
+import { IsUUID } from 'class-validator';
 
 interface AuthenticatedRequest extends Request {
   user: { id: string; username: string };
 }
 
 @Controller('events')
-@UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
+@UsePipes(new ValidationPipe({ transform: true, whitelist: true, transformOptions: { enableImplicitConversion: false } }))
 export class EventsController {
   constructor(private readonly eventsService: EventsService) {}
 
   @Get()
-  async findAll() {
+  @UseGuards(JwtAuthGuard)
+  async findAll(@Request() req: AuthenticatedRequest) {
     try {
-      return await this.eventsService.findAll();
+      return await this.eventsService.findAll(req.user.id);
     } catch (error) {
       throw new BadRequestException(
         error instanceof Error ? error.message : 'Failed to fetch events',
@@ -38,7 +40,7 @@ export class EventsController {
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: string) {
+  async findOne(@Param('id', new ValidationPipe({ transform: true })) id: string) {
     try {
       return await this.eventsService.findOne(id);
     } catch (error) {

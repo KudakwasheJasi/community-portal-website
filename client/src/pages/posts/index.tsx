@@ -116,19 +116,21 @@ const PostsPageContent: React.FC = () => {
         <Box sx={{ mb: 3 }}>
           <Box sx={{
             display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
+            flexDirection: { xs: 'column', sm: 'row' },
+            justifyContent: { xs: 'flex-start', sm: 'space-between' },
+            alignItems: { xs: 'flex-start', sm: 'center' },
+            gap: { xs: 2, sm: 0 },
             mb: 2
           }}>
             <Typography variant="h3" component="h1" sx={{
               fontWeight: 700,
               color: 'text.primary',
-              fontSize: '2.5rem'
+              fontSize: { xs: '1.8rem', sm: '2.5rem' }
             }}>
               Posts Management
             </Typography>
 
-            <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'center' }}>
+            <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'center', flexWrap: 'wrap' }}>
               <ToggleButtonGroup
                 value={viewMode}
                 exclusive
