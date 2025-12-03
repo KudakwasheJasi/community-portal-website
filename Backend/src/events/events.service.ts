@@ -209,15 +209,14 @@ export class EventsService {
   }
 
   async remove(id: string, userId: string): Promise<void> {
-    const event = await this.findOne(id);
+    // First, delete all registrations for this event to avoid foreign key constraints
+    await this.registrationRepository.delete({ event: { id } });
 
-    // Note: Authorization check removed for delete - frontend should only show user's events
+    // Then delete the event
+    const result = await this.eventRepository.delete(id);
 
-    try {
-      await this.eventRepository.remove(event);
-    } catch (error) {
-      // If direct remove fails, try delete query
-      await this.eventRepository.delete(id);
+    if (result.affected === 0) {
+      throw new NotFoundException('Event not found');
     }
   }
 
